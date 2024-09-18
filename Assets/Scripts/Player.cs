@@ -1,0 +1,195 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Net.Sockets;
+using Unity.VisualScripting;
+using UnityEditor.U2D;
+using UnityEngine;
+using UnityEngine.UIElements;
+using static Unity.Burst.Intrinsics.X86;
+
+public class Player : MonoBehaviour
+{
+    Animator ani;
+    [HideInInspector] public float accel = .2f, airAccel = .1f; float vXSmoothing;
+    [HideInInspector] public float[] jumpData = new float[] { 4, .5f, 2, .25f, 9, 1.2f };
+    [HideInInspector] public float maxJPower, wallSp, minJPower, wallStickTime, maxJHeight = 4f, jumpApexTime = .5f, minJHeight;
+    [HideInInspector] public Controller contr;
+    [HideInInspector] public bool flipped, wallClimbing, crouching;
+
+    public float gravity, speed, fireTimer, iceTimer, invincibleTimer;
+    public Vector3 velocity; bool hasStatusEffectOn;
+    float wDirX, tarVX, wallStickTimeLeft, iceTimeLeft, fireTimeLeft, invincTimeLeft = 2;
+    public int carryId, hp; public bool carryingItem;
+    SpriteRenderer sprite;
+    public Color[] colorStates;
+    bool invincible, onFire, iced;
+    public Vector2 wallKick, wallClimb, dmgBounce, input;
+    public static Player Ins;
+    public float f;
+
+    private void Awake()
+    {
+        if (Ins == null)
+            Ins = this;
+        ani = GetComponent<Animator>();
+    }
+    void Start()
+    {
+        invincible = flipped = wallClimbing = false;
+        minJHeight = .8f;
+        sprite = GetComponent<SpriteRenderer>();
+        contr = GetComponent<Controller>();
+        JumpHeights(maxJHeight, jumpApexTime, minJHeight);
+
+        speed = 10;
+    }
+
+    public void OnJumpInputDown()
+    {
+        if (wallClimbing)
+        {
+
+            if (wDirX == input.x)
+            {
+                velocity.x = -wDirX * wallClimb.x;
+                velocity.y = wallClimb.y;
+            }
+            else
+            {
+                velocity.x = -wDirX * wallKick.x;
+                velocity.y = wallKick.y;
+            }
+            ani.SetTrigger("Jumped");
+        }
+        else if ((!flipped && (contr.cols.below || contr.canCJump)) || (flipped && (contr.cols.above || contr.canCJump)))
+        { velocity.y = flipped ? -maxJPower : maxJPower; contr.canCJump = contr.wasGrounded = false; contr.justJumped = true; ani.SetTrigger("Jumped"); }
+    }
+    public void OnJumpInputUp()
+    {
+
+        if ((!flipped && velocity.y > minJPower) || (flipped && velocity.y < -minJPower))
+            velocity.y = flipped ? -minJPower : minJPower;
+    }
+    // Update is called once per frame
+    void Update()
+    {
+        CalcCooldowns();
+        CalcVelocity();
+        HandleWallSliding();
+
+
+        contr.Move(velocity * Time.deltaTime, input);
+        if (contr.cols.above || contr.cols.below) velocity.y = 0;
+    }
+    public void CalcCooldowns()
+    {
+        if (invincible && invincTimeLeft <= 0) { invincible = false; invincTimeLeft = invincibleTimer; }
+        else if (invincible && invincTimeLeft > 0) invincTimeLeft -= Time.deltaTime;
+
+        if (iced && iceTimeLeft > 0)
+        { iceTimeLeft -= Time.deltaTime; if (!invincible) sprite.color = colorStates[4]; }
+        else if (iced && iceTimeLeft <= 0) { iced = false; iceTimeLeft = iceTimer; speed = 10; }
+
+        if (!invincible && onFire && fireTimeLeft > 0)
+        { fireTimeLeft -= Time.deltaTime; sprite.color = colorStates[5]; }
+        else if (onFire && fireTimeLeft <= 0) { onFire = false; fireTimeLeft = fireTimer; }
+
+        if (!invincible && !onFire && !iced)
+        { sprite.color = colorStates[3]; hasStatusEffectOn = false; }
+    }
+    public void HandleWallSliding()
+    {
+        wDirX = contr.cols.left ? -1 : 1;
+        wallClimbing = false;
+        if ((!contr.cols.above && !contr.cols.below && velocity.y < 0) && (contr.cols.right || contr.cols.left))
+        {
+            wallClimbing = true;
+
+            if (velocity.y < -wallSp) velocity.y = -wallSp;
+
+            if (wallStickTimeLeft > 0)
+            {
+                vXSmoothing = 0;
+                velocity.x = 0;
+                if (input.x == -wDirX)
+                    wallStickTimeLeft -= Time.deltaTime;
+                else { wallStickTimeLeft = wallStickTime; }
+            }
+            else { wallStickTimeLeft = wallStickTime; }
+        }
+    }
+    public void CalcVelocity()
+    {
+        tarVX = input.x * speed;
+        velocity.x = Mathf.SmoothDamp(velocity.x, tarVX, ref vXSmoothing, (contr.cols.below) ? accel : airAccel);
+        velocity.y += !flipped ? gravity * Time.deltaTime : 0;
+        velocity.y -= flipped ? gravity * Time.deltaTime : 0;
+    }
+    void JumpHeights(float maxJpHeight, float JApex, float minJHeight)
+    {
+        gravity = -(2 * maxJpHeight) / Mathf.Pow(JApex, 2);
+        maxJPower = Mathf.Abs(gravity) * jumpApexTime;
+        minJPower = Mathf.Sqrt(2 * Mathf.Abs(gravity) * minJHeight);
+    }
+    public void ChangeGravity(int val)
+    {
+        switch (val)
+        {
+            case 0: flipped = !flipped; break;
+            case 1: jumpApexTime = jumpData[5]; maxJHeight = jumpData[4]; minJHeight = 2.5f; break;
+            case 2: jumpApexTime = jumpData[3]; maxJHeight = jumpData[2]; minJHeight = .5f; break;
+            case 3: jumpApexTime = jumpData[1]; maxJHeight = jumpData[0]; minJHeight = 1f; break;
+        }
+        JumpHeights(maxJHeight, jumpApexTime, minJHeight);
+    }
+    public void TakeDamage(int dmg, int effect = 0)
+    {
+        if (invincible) { print("im invicible bitch, for at least " + invincTimeLeft); return; }
+        invincible = true;
+        ani.SetTrigger("Hurt");
+        int HP = hp; hp = hp - dmg; int d = dmg;
+        velocity.y = dmgBounce.y;
+        velocity.x = dmgBounce.x * -contr.dirX;
+        if (effect > 0 && !hasStatusEffectOn) StartCoroutine(Effects(effect));
+        StartCoroutine(DamagedColors());
+
+        if (hp != HP - d) hp = HP - d;
+        if (hp <= 0) { print($"dead hp = {hp}"); ani.SetTrigger("Die"); }
+    }
+    public void ApplyEffect(int effect = 0)
+    {
+        if (effect > 0 && !hasStatusEffectOn) StartCoroutine(Effects(effect));
+    }
+    IEnumerator Effects(int effect)
+    {
+        hasStatusEffectOn = true;
+        switch (effect)
+        {
+            case 1: iced = true; iceTimeLeft = iceTimer; speed = 5; break;
+            case 2:
+                onFire = true; fireTimeLeft = fireTimer;
+                while (onFire)
+                {
+                    hp = invincible ? hp : hp - 1;
+                    if (hp <= 0) { onFire = false; print("you burned to death! bum!"); ani.SetTrigger("Die"); }
+                    yield return new WaitForSeconds(1f);
+                }
+                break;
+        }
+        yield return null;
+    }
+    IEnumerator DamagedColors()
+    {
+
+        while (invincible)
+        {
+            sprite.color = colorStates[0];
+            yield return new WaitForSeconds(.25f);
+            sprite.color = colorStates[1];
+            yield return new WaitForSeconds(.25f);
+        }
+    }
+    public void Die() => gameObject.SetActive(false);
+}
+
