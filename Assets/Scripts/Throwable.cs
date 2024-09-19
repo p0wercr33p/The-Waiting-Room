@@ -8,6 +8,7 @@ public class Throwable : RaycastController
     Player player; public Vector2 throwForce, grabHitBox;
     public bool canFloat, isFloating, beingCarried, inRange;
     public Vector2 velocity;
+    Manager manager;
     public float gravity, accel, lerpSpeed;
     [SerializeField]
     GrabBox grabBox; 
@@ -29,6 +30,7 @@ public class Throwable : RaycastController
         base.Start();
         col = GetComponent<BoxCollider2D>();
         player = Player.Ins;
+        manager = Manager.Ins;
         contr = Controller.Ins;
         playerCol = player.GetComponent<BoxCollider2D>();
         Id = gameObject.GetInstanceID();
@@ -83,7 +85,8 @@ public class Throwable : RaycastController
     }
     public void HandleDestruction(){
         col.enabled = true; beingCarried = false; inRange = false;
-        player.carryingItem = false; player.carryId = 0; gameObject.SetActive(false);
+        player.carryingItem = false; player.carryId = 0; transform.parent = manager.transform; 
+        gameObject.SetActive(false);
     }
     (GameObject, Projectile) GetProjectile()
     {
@@ -116,12 +119,14 @@ public class Throwable : RaycastController
     void Carry()
     {
         if (player.carryingItem) return; 
-        player.carryingItem = true; 
+        player.carryingItem = true;
+        transform.parent = player.transform;
         beingCarried = true; col.enabled = false; justGrabbed = true; isFloating = false;
     }
     void Throw()
     {
-        player.carryingItem = beingCarried = inRange = isFloating = false; ;
+        player.carryingItem = beingCarried = inRange = isFloating = false;
+        transform.parent = manager.transform;
         col.enabled = true; 
         UpdateRayOrigins(); 
         CalcRaySpacing();
@@ -137,10 +142,12 @@ public class Throwable : RaycastController
     private void UpdateCarriedPosition()
     {
         if (player.gameObject == null){
-            col.enabled = true; beingCarried = false; inRange = false; isFloating = false; return;
+            col.enabled = true; beingCarried = false; inRange = false; isFloating = false;
+            transform.parent = manager.transform;
+            return;
         }
-        Vector3 targetPosition = new Vector3(player.transform.position.x, player.transform.position.y + (player.flipped ? -1.5f : 1.5f), transform.position.z);
-        transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * lerpSpeed); 
+        Vector3 targetPosition = new Vector3(0, player.flipped ? -.25f : .25f, 0);
+        transform.localPosition = targetPosition;
     }
     private void ApplyGravity()
     {

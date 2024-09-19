@@ -69,6 +69,7 @@ public class MovingObject : RaycastController
         {
             globalWP[i] = global ? waypoints[i] : waypoints[i] + transform.position;
         }
+        enemy.Rotate();
     }
     void Update()
     {
@@ -79,7 +80,7 @@ public class MovingObject : RaycastController
         if (type == ObjectType.PLATFORM) CalcPassengerMovement(velocity);
 
         MovePassengers(true);
-        transform.Translate(velocity);
+        transform.Translate(velocity, Space.World);
         MovePassengers(false);
     }
     Vector2 CalcMovement(){

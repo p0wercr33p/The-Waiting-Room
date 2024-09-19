@@ -226,8 +226,6 @@ MonoBehaviour:
   dummyRainbow: []
   spR: {fileID: 0}
   laserLine: {fileID: 0}
-  maxLaserDist: 60
-  laserTimeLeft: 0
   dmg: 1
   cap: 3
   contactDmg: 2
@@ -237,4 +235,6 @@ MonoBehaviour:
   laserTime: 0
   aimAtPlayer: 1
   hasWayPoints: 0
+  cannon: 0
   shootDir: {x: 0, y: 0}
+  firePoint: {fileID: 1034310862719263696}

@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 8981205335298139539}
   - component: {fileID: 4780572232701356463}
   - component: {fileID: 6573939298922556195}
+  - component: {fileID: -319880137906169776}
+  - component: {fileID: 4104720445442474686}
   m_Layer: 0
   m_Name: MovingLaserCannon
   m_TagString: Enemy
@@ -31,7 +33,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0.1}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -77,8 +79,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.6234543, g: 0.3501424, b: 0.7830189, a: 1}
+  m_Sprite: {fileID: 2127965657, guid: 170011e464fb5f04bb087b32ad7d17e8, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -109,8 +111,6 @@ MonoBehaviour:
   dummyRainbow: []
   spR: {fileID: 0}
   laserLine: {fileID: 4780572232701356463}
-  maxLaserDist: 100
-  laserTimeLeft: 0
   dmg: 1
   cap: 3
   contactDmg: 0
@@ -120,7 +120,9 @@ MonoBehaviour:
   laserTime: 2.5
   aimAtPlayer: 0
   hasWayPoints: 1
+  lookAtShootDir: 0
   shootDir: {x: 0, y: 0}
+  firePoint: {fileID: 8566766489131400923}
 --- !u!61 &8981205335298139539
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -153,18 +155,18 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.038686395, y: 0.02579093}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 3.52, y: 3.52}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 2.5216687, y: 2.4442954}
   m_EdgeRadius: 0
 --- !u!120 &4780572232701356463
 LineRenderer:
@@ -187,7 +189,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: e5c7a77311762e144947d83e41064d5f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -213,7 +215,7 @@ LineRenderer:
   - {x: 0, y: 0, z: 1}
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.5470257
+    widthMultiplier: 0.6949122
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -262,7 +264,7 @@ LineRenderer:
     numCornerVertices: 0
     numCapVertices: 0
     alignment: 0
-    textureMode: 0
+    textureMode: 1
     textureScale: {x: 1, y: 1}
     shadowBias: 0.5
     generateLightingData: 0
@@ -307,11 +309,51 @@ MonoBehaviour:
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 0}
   globalWP: []
-  speed: 6
+  speed: 3
   type: 1
   fromWPi: 0
   perWP: 0
-  cyclic: 0
+  cyclic: 1
   wpcolor: {r: 0.3773585, g: 0.28266287, b: 0.28266287, a: 1}
   sprite: {fileID: 0}
   global: 1
+--- !u!114 &-319880137906169776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8482431479798731645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e99d74f2c0e5b04f9dc9a58758c2b48, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fps: 15
+  textures:
+  - {fileID: 2800000, guid: ec292b3ca30fb9844874c7c3c4efc640, type: 3}
+  - {fileID: 2800000, guid: 13fd908253468d84a97d6c24d148efe4, type: 3}
+  - {fileID: 2800000, guid: 91b0b515a15f98c49be35e502ff990bf, type: 3}
+  - {fileID: 2800000, guid: 2f2486c21bb2bda4287fc27eb746b72f, type: 3}
+  - {fileID: 2800000, guid: 714491826dbb7154991b84ea67667a52, type: 3}
+--- !u!95 &4104720445442474686
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8482431479798731645}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: dbaf6a97bde14ff4694387f39b65220c, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

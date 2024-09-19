@@ -12,6 +12,7 @@ public class Controller : RaycastController
     public float dirX, dirY; Player player;
     public static Controller Ins;
     [HideInInspector] public float coyoteDur; float heldDir;
+    public bool drawX, drawY;
     public override void Awake()
     {
         base.Awake();
@@ -62,8 +63,12 @@ public class Controller : RaycastController
             rayOg += Vector2.up * (hRaySpacing * i);
             RaycastHit2D hit = Physics2D.Raycast(rayOg, Vector2.right * dirX, rayLength, mask);
 
-            Debug.DrawRay(rayOg, Vector2.right * dirX, Color.red);
-            Debug.DrawRay(rayOg, Vector2.right * dirX * rayLength, Color.green);
+            if (drawX)
+            {
+                Debug.DrawRay(rayOg, Vector2.right * dirX, Color.red);
+                Debug.DrawRay(rayOg, Vector2.right * dirX * rayLength, Color.green);
+            }
+            
 
             if (hit)
             {
@@ -86,9 +91,12 @@ public class Controller : RaycastController
             rayOg += Vector2.right * (vRaySpacing * i + velocity.x);
             RaycastHit2D hit = Physics2D.Raycast(rayOg, Vector2.up * dirY, rayLength, mask);
 
-            Debug.DrawRay(rayOg, Vector2.up * dirY, Color.red);
-            Debug.DrawRay(rayOg, Vector2.up * dirY * rayLength, Color.green);
-
+            if (drawY)
+            {
+                Debug.DrawRay(rayOg, Vector2.up * dirY, Color.red);
+                Debug.DrawRay(rayOg, Vector2.up * dirY * rayLength, Color.green);
+            }
+            
             if (hit)
             {
                 if (hit.collider.tag == "Pass") {

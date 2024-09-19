@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 using UnityEngine.UIElements;
 
 public class Obstacle : MonoBehaviour
@@ -12,7 +14,8 @@ public class Obstacle : MonoBehaviour
     public ObstacleType type;
     public ObstacleClass classType;
 
-    private bool isInitialized = false, inRange;
+    private bool isInitialized = false;
+    [SerializeField] bool inRange;
     public int effect = 0, dmg, healAmount, index;
     bool active = false, startTimer, healed;
     public bool hasTimer, hasWayPoins, triggerByKeyPress;
@@ -27,25 +30,26 @@ public class Obstacle : MonoBehaviour
     private void Awake()
     {
         hitbox = GetComponent<Collider2D>();
-        player = Player.Ins; startTimer = true; active = healed = false;
+        startTimer = true; active = healed = false;
         sprite = GetComponent<SpriteRenderer>();
-        manager = Manager.Ins;
+        
     }
     void Start()
     {
-        
+        player = Player.Ins;
+        manager = Manager.Ins;
         if (classType != ObstacleClass.DANGER || type == ObstacleType.NONE) dmg = 0;
         else if (type == ObstacleType.SPIKES || type == ObstacleType.SAWS) dmg = 1;
         else if (type == ObstacleType.FIRE) dmg = 2;
         else if (type == ObstacleType.EXPLOSION) dmg = 4;
         else if (type == ObstacleType.FURY){
             dmg = 4;
-            if (Random.Range(0,10) > 4){
+            int ran = UnityEngine.Random.Range(0,10);
+            if (ran > 4){
                 transform.rotation = Quaternion.Euler(0, 0, 90f);
             } else{
                 transform.position = new Vector2(transform.position.x, -9);
             }
-            
         }
         switch (property)
         {
@@ -99,7 +103,7 @@ public class Obstacle : MonoBehaviour
     void Reactivated()
     {
         lifeLeft = lifeTimer; startTimer = true; sprite.enabled = true;
-        if (type == ObstacleType.FURY) transform.position = new Vector2(transform.position.x, -5);
+    
     }
     void Explode()
     {
@@ -110,11 +114,13 @@ public class Obstacle : MonoBehaviour
         hitbox.enabled = false;
         explosion.SetActive(true);
         throwable.col.enabled = true; throwable.beingCarried = throwable.inRange = startTimer = false;
+        transform.parent = manager.transform;
         if (index >= 0) manager.Swap(index);
         gameObject.SetActive(false);
     }
     void Trigger()
     {
+        print($"Triggering on {gameObject.name} spR? {sprite != null}");
         foreach (var obj in triggerObjs)
         {
             obj.SetActive(!obj.activeSelf);
@@ -125,25 +131,22 @@ public class Obstacle : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D coll)
     {
         bool isPlayer = coll.CompareTag("Player");
+       
         if (isPlayer)
         {
-            if (classType == ObstacleClass.DANGER)
-            {
+            if (classType == ObstacleClass.DANGER){
                 print($"Hit em with the {type}");
                 player.TakeDamage(dmg, effect);
-            }
-            else if (classType == ObstacleClass.HEALING && !healed)
+            } else if (classType == ObstacleClass.HEALING && !healed)
             {
                 print("LIVEEEE!! OOOOBBAAAAA!!!");
                 player.hp += healAmount;
+            } else if (classType == ObstacleClass.EFFECT) { player.ApplyEffect(effect); }
+            else if (classType == ObstacleClass.TRIGGER){
+                print($"Triggering...........:)........");
+                if (!triggerByKeyPress) Trigger();
+                else inRange = true;
             }
-            else if (classType == ObstacleClass.EFFECT) { player.ApplyEffect(effect); }
-        }
-        else if (classType == ObstacleClass.TRIGGER && isPlayer)
-        {
-            print($"Triggering...........:)........");
-            if (!triggerByKeyPress) Trigger();
-            else inRange = true;
         }
         if (type == ObstacleType.EXPLOSION)
         {

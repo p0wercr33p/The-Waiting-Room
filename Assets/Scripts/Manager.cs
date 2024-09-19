@@ -83,12 +83,13 @@ public class Manager : MonoBehaviour
         }
         for (int i = 0; i < levelItems; i++)
         {
-            GameObject h = Instantiate(headsUp, this.transform);
+            GameObject h = Instantiate(headsUp, transform);
             h.transform.position = itemPoints[i];
             headsUps[i] = h;
             h.SetActive(false); int ran = Random.Range(0, bank.lvlItems[lvl].Length);
-            GameObject it = Instantiate(bank.lvlItems[lvl][ran], this.transform);
+            GameObject it = Instantiate(bank.lvlItems[lvl][ran], transform);
             print(it.name);
+            h.name = $"HeadsUp! {it.name} {i}";
             it.transform.position = itemPoints[i];
             items[i] = it; it.SetActive(false);
         }
@@ -124,6 +125,7 @@ public class Manager : MonoBehaviour
             cannon.SetActive(false);
         }
 
+       
     }
     (GameObject, GameObject, int) FindHazard(int stI)
     {

@@ -205,12 +205,14 @@ MonoBehaviour:
   property: 2
   type: 5
   classType: 2
+  inRange: 0
   effect: 0
   dmg: 0
   healAmount: 0
   index: 0
   hasTimer: 1
   hasWayPoins: 0
+  triggerByKeyPress: 0
   lifeLeft: 999
   lifeTimer: 999
   triggerObjs:
