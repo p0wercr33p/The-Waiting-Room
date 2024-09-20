@@ -32,7 +32,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0.1}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_LocalScale: {x: 0.6, y: 0.6, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -119,7 +119,7 @@ MonoBehaviour:
   laserTime: 3
   aimAtPlayer: 0
   hasWayPoints: 0
-  cannon: 0
+  lookAtShootDir: 0
   shootDir: {x: 0, y: -1}
   firePoint: {fileID: 1766795341422620044}
 --- !u!61 &4943020479536785918

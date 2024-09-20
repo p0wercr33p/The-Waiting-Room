@@ -145,16 +145,16 @@ public class Player : MonoBehaviour
     }
     public void TakeDamage(int dmg, int effect = 0)
     {
-        if (invincible) { print("im invicible bitch, for at least " + invincTimeLeft); return; }
+        if (invincible) { return; }
         invincible = true;
         ani.SetTrigger("Hurt");
-        int HP = hp; hp = hp - dmg; int d = dmg;
+        hp = hp - dmg;
+        print($"owch, {hp + dmg} - {dmg} = {hp} health left");
         velocity.y = dmgBounce.y;
         velocity.x = dmgBounce.x * -contr.dirX;
         if (effect > 0 && !hasStatusEffectOn) StartCoroutine(Effects(effect));
         StartCoroutine(DamagedColors());
 
-        if (hp != HP - d) hp = HP - d;
         if (hp <= 0) { print($"dead hp = {hp}"); ani.SetTrigger("Die"); }
     }
     public void ApplyEffect(int effect = 0)

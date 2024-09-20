@@ -25,27 +25,23 @@ public class Enemy : MonoBehaviour
     public float timeLeft, cooldown;
     bool canAttack, attacking;
     public float laserTime;
-    public bool aimAtPlayer, hasWayPoints, lookAtShootDir;
+    public bool aimAtPlayer, hasWayPoints, lookAtShootDir, hasFollowAI, inShootRange;
     private bool isInitialized;
     public Vector2 shootDir;
     [SerializeField] Transform firePoint;
 
-    private void Awake()
-    {
-
+    private void Awake(){
         spR = GetComponent<SpriteRenderer>();
         ani = GetComponent<Animator>();
         canAttack = false; timeLeft = cooldown;
         playerTag = "Player";
     }
-    void Start()
-    {
+    void Start(){
         player = Player.Ins;
         InitializeProjectiles();
         if (!hasWayPoints) Rotate();
     }
-    public void Rotate()
-    {
+    public void Rotate() {
         if (lookAtShootDir)
         {
             switch (shootDir)
@@ -68,8 +64,7 @@ public class Enemy : MonoBehaviour
             }
         }
     }
-    void InitializeProjectiles()
-    {
+    void InitializeProjectiles(){
         if (type != EnemyType.MELEE && type != EnemyType.DUMMY && bullet == BulletType.PROJECTILE)
         {
             print("initializing");
@@ -84,8 +79,7 @@ public class Enemy : MonoBehaviour
         }
     }
     // Update is called once per frame
-    void Update()
-    {
+    void Update() {
         if (!canAttack && !attacking)
         {
             timeLeft -= Time.deltaTime;
@@ -95,7 +89,7 @@ public class Enemy : MonoBehaviour
                 timeLeft = cooldown;
             }
         }
-        else if (canAttack && !attacking)
+        else if (canAttack && !attacking && ((!hasFollowAI) || (hasFollowAI && inShootRange)))
         {
             canAttack = false;
             print("attacking");
@@ -104,16 +98,14 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    public void ShootLogic()
-    {
+    public void ShootLogic(){
         Vector2 dir = (player.transform.position - firePoint.position).normalized;
 
         if (bullet == BulletType.PROJECTILE) Shoot(dir);
         else if (bullet == BulletType.LASER) StartCoroutine(HoldLaserFire(shootDir));
 
     }
-    public IEnumerator HoldLaserFire(Vector2 dir)
-    {
+    public IEnumerator HoldLaserFire(Vector2 dir){
         print("holding down laser fire");
         attacking = true;
         laserTimeLeft = laserTime;
@@ -132,63 +124,56 @@ public class Enemy : MonoBehaviour
         laserLine.SetPosition(1, transform.position);
     }
 
-    void ShootLaser(Vector2 dir)
-    {
+    void ShootLaser(Vector2 dir){
         print("firing da laser");
         RaycastHit2D laserHit = Physics2D.Raycast((Vector2)firePoint.position, dir, maxLaserDist, laserMask);
 
-        if (laserHit)
-        {
+        if (laserHit){
             print($"hit {laserHit.transform.name} (its tag --> {laserHit.transform.tag}");
             DrawLaser(transform.position, laserHit.point);
             if (laserHit.transform.tag == playerTag) player.TakeDamage(dmg);
-        }
-        else
-        {
+        }else{
             Vector2 endPos = (Vector2)transform.position + dir * maxLaserDist;
             DrawLaser(transform.position, endPos);
         }
     }
 
-    void DrawLaser(Vector2 startPos, Vector2 endPos)
-    {
+    void DrawLaser(Vector2 startPos, Vector2 endPos){
         laserLine.SetPosition(0, startPos);
         laserLine.SetPosition(1, endPos);
     }
-    (GameObject, Projectile) GetProjectile()
-    {
-        for (int i = 0; i < cap; i++)
-        {
+    (GameObject, Projectile) GetProjectile(){
+        for (int i = 0; i < cap; i++){
             if (!projectiles[i].pr.activeInHierarchy)
                 return projectiles[i];
         }
         return (null, null);
     }
-    public void Shoot(Vector2 dir)
-    {
+    public void Shoot(Vector2 dir){
         (GameObject proj, Projectile comp) = GetProjectile();
 
 
-        if (proj != null)
-        {
+        if (proj != null){
             proj.SetActive(true);
             proj.transform.position = firePoint.position;
-            if (aimAtPlayer)
-            {
+
+            if (aimAtPlayer){
                 float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
                 proj.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
                 comp.rb.velocity = proj.transform.right * comp.speed;
+            }else{
+                float angle = Mathf.Atan2(shootDir.y, shootDir.x) * Mathf.Rad2Deg;
+                proj.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
+
+                comp.rb.velocity = proj.transform.right * comp.speed;
             }
-            else { comp.rb.velocity = shootDir * comp.speed; }
         }
         else print("couldn't find a prjectile");
         attacking = false;
     }
-    public void TakeDamage(int dmg)
-    {
+    public void TakeDamage(int dmg){
         hp -= dmg;
-        if (type == EnemyType.DUMMY)
-        {
+        if (type == EnemyType.DUMMY){
             spR.color = dummyRainbow[colorInd];
             print($"OUCH!!!! *blush*  you did ----  {dmg}  ---- Damage ");
             colorInd = (colorInd + 1) % dummyRainbow.Length;
@@ -196,8 +181,7 @@ public class Enemy : MonoBehaviour
         if (hp <= 0) Die();
     }
 
-    private void OnEnable()
-    {
+    private void OnEnable(){
         if (isInitialized) Reactivated();
         else isInitialized = true;
     }

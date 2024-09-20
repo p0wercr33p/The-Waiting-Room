@@ -13,6 +13,7 @@ TagManager:
   - Pass
   - Throwable
   - Moving
+  - Obstacle
   layers:
   - Default
   - TransparentFX

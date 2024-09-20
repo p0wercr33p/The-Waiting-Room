@@ -47,6 +47,7 @@ public class Obstacle : MonoBehaviour
             int ran = UnityEngine.Random.Range(0,10);
             if (ran > 4){
                 transform.rotation = Quaternion.Euler(0, 0, 90f);
+                transform.position = new Vector2(45, transform.position.y);
             } else{
                 transform.position = new Vector2(transform.position.x, -9);
             }
@@ -127,6 +128,7 @@ public class Obstacle : MonoBehaviour
         }
         hitbox.enabled = sprite.enabled = triggerByKeyPress;
         this.enabled = triggerByKeyPress;
+        AstarPath.active.Scan();
     }
     private void OnTriggerEnter2D(Collider2D coll)
     {

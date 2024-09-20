@@ -15,7 +15,6 @@ public class ObjectBank : MonoBehaviour
     [Header("Items")]
     public GameObject pBlaster;
     public GameObject sBlaster;
-    public GameObject healBlast;
     public GameObject heart, troll;
 
 
@@ -47,7 +46,7 @@ public class ObjectBank : MonoBehaviour
     void Trollololo()
     {
         allHazards = new GameObject[] { fireSaws, saws, iceSaws, bombs, freezeBlast, heavensFury };
-        allItems = new GameObject[] { sBlaster, heart, pBlaster, healBlast };
+        allItems = new GameObject[] { sBlaster, heart, pBlaster };
         int ran = Random.Range(0, 11);
         if (ran == 9)
         {
@@ -119,7 +118,7 @@ public class ObjectBank : MonoBehaviour
     {
         lvlItems = new List<GameObject[]>();
         lvlItems.Add(new GameObject[] { heart });
-        lvlItems.Add(new GameObject[] { sBlaster, heart, pBlaster, troll, healBlast });
+        lvlItems.Add(new GameObject[] { sBlaster, heart, pBlaster, troll });
         lvlItems.Add(new GameObject[] { heart, sBlaster });
     }
     
