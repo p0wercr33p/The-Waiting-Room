@@ -161,8 +161,6 @@ MonoBehaviour:
   - {r: 1, g: 1, b: 1, a: 1}
   spR: {fileID: 0}
   laserLine: {fileID: 0}
-  maxLaserDist: 60
-  laserTimeLeft: 0
   dmg: 0
   cap: 99
   contactDmg: 0
@@ -172,4 +170,8 @@ MonoBehaviour:
   laserTime: 0
   aimAtPlayer: 0
   hasWayPoints: 0
+  lookAtShootDir: 0
+  hasFollowAI: 0
+  inShootRange: 0
   shootDir: {x: 0, y: 0}
+  firePoint: {fileID: 0}

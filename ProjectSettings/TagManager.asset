@@ -14,6 +14,7 @@ TagManager:
   - Throwable
   - Moving
   - Obstacle
+  - ProjectileHolder
   layers:
   - Default
   - TransparentFX
@@ -23,7 +24,7 @@ TagManager:
   - UI
   - Obstacle
   - Player
-  - 
+  - NotWalkable
   - 
   - 
   - 

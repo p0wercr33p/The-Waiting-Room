@@ -9,7 +9,7 @@ public class Obstacle : MonoBehaviour
 {
     public enum ObstacleClass { DANGER, TRIGGER, INTERACTABLE, HEALING, EFFECT };
     public enum ObstacleType { SPIKES, SAWS, FIRE, EXPLOSION, FURY, BOMB, NONE };
-    public enum Effect { ICE, FIRE, NONE };
+    public enum Effect { ICE, FIRE, ElECTRIC, NONE };
     public Effect property;
     public ObstacleType type;
     public ObstacleClass classType;
@@ -56,6 +56,7 @@ public class Obstacle : MonoBehaviour
         {
             case Effect.ICE: effect = 1; break;
             case Effect.FIRE: effect = 2; break;
+            case Effect.ElECTRIC: effect = 3; break;
             case Effect.NONE: effect = 0; break;
         }
         if (type == ObstacleType.BOMB) { explosion = Instantiate(triggerObjs[0]); explosion.SetActive(false); throwable = GetComponent<Throwable>(); }

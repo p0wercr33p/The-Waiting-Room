@@ -1,25 +1,30 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static PlayerInput;
 using static Unity.Burst.Intrinsics.X86.Avx;
 
 public class Throwable : RaycastController
 {
-    Player player; public Vector2 throwForce, grabHitBox;
-    public bool canFloat, isFloating, beingCarried, inRange;
+    Player player; 
+    public Vector2 throwForce, grabHitBox;
+    public bool isFloating, beingCarried, inRange;
     public Vector2 velocity;
     Manager manager;
-    public float gravity, accel, lerpSpeed;
+    public float gravity;
+    PlayerInput plInput;
     [SerializeField]
     GrabBox grabBox; 
     [HideInInspector] public BoxCollider2D col, playerCol; Controller contr;
-    public int Id; public bool draw; [SerializeField] float objDirX = 1;
-    bool below, above, left, right,justGrabbed; float vXSmoothing;
-    private float dragCoefficient; public Color grabBoxColor;
-    public bool interactable, destroyOnceEmpty, mouseAim; public int healAmount, usages;
-    (GameObject pr, Projectile info)[] projectiles; public GameObject projectile;
-    public int maxProj;
-    public enum ItemType { BOMB, BLASTER, BUTTER, HEALING}
+    [HideInInspector] public int Id; 
+    public bool draw;
+    bool below, above, left, right,justGrabbed; 
+    float vXSmoothing;
+    public Color grabBoxColor;
+    public bool interactable, destroyOnceEmpty; 
+    public int healAmount, usages;
+    public string projName;
+    public enum ItemType { BOMB, BLASTER, HEALING}
     public ItemType type;
     public override void Awake()
     {
@@ -30,20 +35,12 @@ public class Throwable : RaycastController
         base.Start();
         col = GetComponent<BoxCollider2D>();
         player = Player.Ins;
+        plInput = PlayerInput.Ins;
         manager = Manager.Ins;
         contr = Controller.Ins;
         playerCol = player.GetComponent<BoxCollider2D>();
         Id = gameObject.GetInstanceID();
-        grabBox = new GrabBox(col.bounds, grabHitBox, player, Id);
-        isFloating = canFloat;
-        if (projectile != null){
-            projectiles = new (GameObject, Projectile)[maxProj];
-            for (int i = 0; i < maxProj; i++)
-            {
-                GameObject pr = Instantiate(projectile); Projectile info = pr.GetComponent<Projectile>();
-                pr.SetActive(false); projectiles[i] = (pr, info);
-            }
-        }
+        grabBox = new GrabBox(col.bounds, grabHitBox, player, Id);        
     }
 
     // Update is called once per frame
@@ -64,7 +61,6 @@ public class Throwable : RaycastController
             }
             grabBox.Move(transform.position);
         }else{
-            UpdateCarriedPosition(); 
             if (interactable && Input.GetKeyDown(KeyCode.J))
                 UseItem(); 
             if (!justGrabbed && Input.GetKeyDown(KeyCode.F))
@@ -75,10 +71,15 @@ public class Throwable : RaycastController
         if (usages <= 0 && !destroyOnceEmpty) return;
 
         if (type == ItemType.BLASTER)
-            Shoot();
+        {
+            plInput.usages[projName] += usages;
+            HandleDestruction();
+        }
         else if (type == ItemType.HEALING)
+        {
             player.hp += healAmount;
-        usages--;
+            usages--;
+        }
 
         if (usages <= 0 && destroyOnceEmpty)
             HandleDestruction();
@@ -88,40 +89,15 @@ public class Throwable : RaycastController
         player.carryingItem = false; player.carryId = 0; transform.parent = manager.transform; 
         gameObject.SetActive(false);
     }
-    (GameObject, Projectile) GetProjectile()
-    {
-        for (int i = 0; i < maxProj; i++)
-        {
-            if (!projectiles[i].pr.activeInHierarchy)
-                return projectiles[i];
-        }
-        return (null, null);
-    }
-    void Shoot()
-    {
-        (GameObject proj, Projectile comp) = GetProjectile();
-        objDirX = contr.dirX;
-
-        if (proj != null)
-        {
-            proj.SetActive(true);
-            proj.transform.position = transform.position;
-            if (mouseAim){
-                Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                Vector2 dir = (mousePos - (Vector2)proj.transform.position).normalized;
-                float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-                proj.transform.rotation = Quaternion.Euler(0, 0, angle);
-                objDirX = 1;
-            }
-            comp.rb.velocity = (proj.transform.right * comp.speed) * objDirX;
-        }
-    }
+    
     void Carry()
     {
         if (player.carryingItem) return; 
         player.carryingItem = true;
         transform.parent = player.transform;
         beingCarried = true; col.enabled = false; justGrabbed = true; isFloating = false;
+        Vector3 targetPosition = new Vector3(0, .25f, 0);
+        transform.localPosition = targetPosition;
     }
     void Throw()
     {
@@ -138,16 +114,6 @@ public class Throwable : RaycastController
 
         velocity = throwDirection * throwForce.magnitude;
         grabBox.Move(transform.position);
-    }
-    private void UpdateCarriedPosition()
-    {
-        if (player.gameObject == null){
-            col.enabled = true; beingCarried = false; inRange = false; isFloating = false;
-            transform.parent = manager.transform;
-            return;
-        }
-        Vector3 targetPosition = new Vector3(0, player.flipped ? -.25f : .25f, 0);
-        transform.localPosition = targetPosition;
     }
     private void ApplyGravity()
     {

@@ -114,14 +114,14 @@ MonoBehaviour:
   mask:
     serializedVersion: 2
     m_Bits: 72
-  throwForce: {x: 0.5, y: 0.5}
+  throwForce: {x: 0.5, y: 0.4}
   grabHitBox: {x: 2.5, y: 2.5}
   canFloat: 0
   isFloating: 0
   beingCarried: 0
   inRange: 0
   velocity: {x: 0, y: 0}
-  gravity: -4
+  gravity: -3
   accel: 1
   lerpSpeed: 10
   grabBox:
@@ -134,15 +134,12 @@ MonoBehaviour:
   playerCol: {fileID: 0}
   Id: 0
   draw: 1
-  objDirX: 1
   grabBoxColor: {r: 1, g: 0, b: 0, a: 0.68235296}
   interactable: 1
   destroyOnceEmpty: 1
-  mouseAim: 0
   healAmount: 3
   usages: 1
-  projectile: {fileID: 0}
-  maxProj: 0
+  projName: 
   type: 3
 --- !u!61 &369350831458333121
 BoxCollider2D:

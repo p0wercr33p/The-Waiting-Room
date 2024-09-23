@@ -131,7 +131,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.88633764, y: 0.8343711}
+  m_Size: {x: 0.89, y: 0.835}
   m_EdgeRadius: 0
 --- !u!50 &3499633380506550765
 Rigidbody2D:
@@ -174,11 +174,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 7
   life: 8
-  dmg: 2
   lifeLeft: 8
+  dmg: 2
+  dmgVsEnemies: 0
+  effect: 0
+  rotate: 0
   rb: {fileID: 3499633380506550765}
   team: 1
-  effect: 0
+  aiPath: {fileID: 0}
+  scale: {x: 0, y: 0}
+  explosionScale: {x: 0, y: 0}
+  defaultHitboxSize: {x: 0.89, y: 0.835}
+  explosionHitboxSize: {x: 0.89, y: 0.835}
+  heetSeeking: 0
 --- !u!95 &3470000319814187875
 Animator:
   serializedVersion: 5

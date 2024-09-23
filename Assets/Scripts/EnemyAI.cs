@@ -6,10 +6,9 @@ using UnityEngine.AI;
 public class EnemyAI : MonoBehaviour
 {
     Transform player;
-    
-    public bool inRange;
     private SpriteRenderer sprite;
     public LayerMask mask;
+    Vector2 scale, curScale;
     private Enemy enemy;
     private Player pl;
     string playerTag;
@@ -19,6 +18,8 @@ public class EnemyAI : MonoBehaviour
         enemy = GetComponent<Enemy>();
         sprite = GetComponent<SpriteRenderer>();
         pl = Player.Ins;
+        scale = transform.localScale;
+        curScale = scale;
         playerTag = "Player";
         player = pl.transform;
     }
@@ -45,6 +46,7 @@ public class EnemyAI : MonoBehaviour
     }
     public void LateUpdate()
     {
-        sprite.flipX = !(transform.position.x > player.position.x);
+        curScale.x = scale.x * Mathf.Sign(transform.position.x - player.position.x);
+        transform.localScale = curScale;
     }
 }

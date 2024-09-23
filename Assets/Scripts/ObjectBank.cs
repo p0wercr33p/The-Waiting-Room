@@ -19,7 +19,10 @@ public class ObjectBank : MonoBehaviour
 
 
     [Header("HazardsInfo")]
-    public int maxFuries, maxBombs, maxSaws, maxBlasts;
+    public int maxFuries;
+    public int maxBombs;
+    public int maxSaws;
+    public int maxBlasts;
     Dictionary<string, int> hazardCounts;
     Dictionary<string, int> maxHazardCounts;
   

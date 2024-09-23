@@ -120,6 +120,8 @@ MonoBehaviour:
   aimAtPlayer: 0
   hasWayPoints: 0
   lookAtShootDir: 0
+  hasFollowAI: 0
+  inShootRange: 1
   shootDir: {x: 0, y: -1}
   firePoint: {fileID: 1766795341422620044}
 --- !u!61 &4943020479536785918

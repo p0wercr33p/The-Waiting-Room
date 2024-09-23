@@ -162,14 +162,11 @@ MonoBehaviour:
     m_Bits: 72
   throwForce: {x: 0.5, y: 0.5}
   grabHitBox: {x: 3, y: 3}
-  canFloat: 1
-  isFloating: 0
+  isFloating: 1
   beingCarried: 0
   inRange: 0
   velocity: {x: 0, y: 0}
   gravity: -3.5
-  accel: 1
-  lerpSpeed: 10
   grabBox:
     center: {x: 0, y: 0}
     right: 0
@@ -180,15 +177,12 @@ MonoBehaviour:
   playerCol: {fileID: 0}
   Id: 0
   draw: 1
-  objDirX: 1
-  grabBoxColor: {r: 0.9680933, g: 0.9716981, b: 0.067835495, a: 0.8039216}
+  grabBoxColor: {r: 0.9680933, g: 0.9716981, b: 0.067835495, a: 0.50980395}
   interactable: 0
   destroyOnceEmpty: 0
-  mouseAim: 0
   healAmount: 0
   usages: 5
-  projectile: {fileID: 0}
-  maxProj: 0
+  projName: SuperBlast
   type: 0
 --- !u!114 &6592393511086465211
 MonoBehaviour:

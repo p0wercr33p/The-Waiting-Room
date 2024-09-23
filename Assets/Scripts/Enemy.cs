@@ -23,22 +23,25 @@ public class Enemy : MonoBehaviour
     int colorInd = 0;
     public int dmg, cap, contactDmg, hp;
     public float timeLeft, cooldown;
-    bool canAttack, attacking;
     public float laserTime;
     public bool aimAtPlayer, hasWayPoints, lookAtShootDir, hasFollowAI, inShootRange;
     private bool isInitialized;
     public Vector2 shootDir;
+    [SerializeField] bool canAttack, attacking;
     [SerializeField] Transform firePoint;
 
     private void Awake(){
         spR = GetComponent<SpriteRenderer>();
         ani = GetComponent<Animator>();
-        canAttack = false; timeLeft = cooldown;
+        canAttack = attacking = false;
+        timeLeft = cooldown;
         playerTag = "Player";
     }
-    void Start(){
+    void Start() {
         player = Player.Ins;
         InitializeProjectiles();
+        if (firePoint == null) firePoint = this.transform;
+        if (!hasFollowAI) inShootRange = true;
         if (!hasWayPoints) Rotate();
     }
     public void Rotate() {
@@ -65,13 +68,14 @@ public class Enemy : MonoBehaviour
         }
     }
     void InitializeProjectiles(){
+        Transform kts = GameObject.FindGameObjectWithTag("ProjectileHolder").transform;
         if (type != EnemyType.MELEE && type != EnemyType.DUMMY && bullet == BulletType.PROJECTILE)
         {
             print("initializing");
             projectiles = new (GameObject, Projectile)[cap];
             for (int i = 0; i < cap; i++)
             {
-                GameObject newProj = Instantiate(projectile);
+                GameObject newProj = Instantiate(projectile, kts);
                 Projectile newProjInfo = newProj.GetComponent<Projectile>();
                 projectiles[i] = (newProj, newProjInfo);
                 newProj.SetActive(false);
@@ -89,7 +93,7 @@ public class Enemy : MonoBehaviour
                 timeLeft = cooldown;
             }
         }
-        else if (canAttack && !attacking && ((!hasFollowAI) || (hasFollowAI && inShootRange)))
+        else if (canAttack && !attacking && inShootRange)
         {
             canAttack = false;
             print("attacking");
@@ -130,11 +134,11 @@ public class Enemy : MonoBehaviour
 
         if (laserHit){
             print($"hit {laserHit.transform.name} (its tag --> {laserHit.transform.tag}");
-            DrawLaser(transform.position, laserHit.point);
+            DrawLaser(firePoint.position, laserHit.point);
             if (laserHit.transform.tag == playerTag) player.TakeDamage(dmg);
         }else{
             Vector2 endPos = (Vector2)transform.position + dir * maxLaserDist;
-            DrawLaser(transform.position, endPos);
+            DrawLaser(firePoint.position, endPos);
         }
     }
 
@@ -157,15 +161,21 @@ public class Enemy : MonoBehaviour
             proj.SetActive(true);
             proj.transform.position = firePoint.position;
 
-            if (aimAtPlayer){
-                float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-                proj.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
-                comp.rb.velocity = proj.transform.right * comp.speed;
-            }else{
-                float angle = Mathf.Atan2(shootDir.y, shootDir.x) * Mathf.Rad2Deg;
-                proj.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
+            if (!comp.heetSeeking){
+                if (aimAtPlayer){
+                    float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+                    proj.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
+                    comp.rb.velocity = proj.transform.right * comp.speed;
+                }else {
+                    float angle = Mathf.Atan2(shootDir.y, shootDir.x) * Mathf.Rad2Deg;
+                    proj.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
 
-                comp.rb.velocity = proj.transform.right * comp.speed;
+                    comp.rb.velocity = proj.transform.right * comp.speed;
+                }
+            } else
+            {
+                float sign = Mathf.Sign(transform.localScale.x);
+                proj.transform.rotation = Quaternion.Euler(new Vector3(0,0, 90 * sign));
             }
         }
         else print("couldn't find a prjectile");
@@ -192,8 +202,6 @@ public class Enemy : MonoBehaviour
     void Die()
     {
         if (type == EnemyType.DUMMY) return;
-        foreach (var p in projectiles)
-            p.pr.SetActive(false);
         gameObject.SetActive(false);
     }
     private void OnTriggerEnter2D(Collider2D collision)

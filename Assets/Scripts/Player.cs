@@ -11,22 +11,22 @@ using static Unity.Burst.Intrinsics.X86;
 public class Player : MonoBehaviour
 {
     Animator ani;
-    [HideInInspector] public float accel = .2f, airAccel = .1f; float vXSmoothing;
+    float vXSmoothing, wallStickTime;
+    [HideInInspector] public float accel = .2f, wallSp, airAccel = .1f; 
     [HideInInspector] public float[] jumpData = new float[] { 4, .5f, 2, .25f, 9, 1.2f };
-    [HideInInspector] public float maxJPower, wallSp, minJPower, wallStickTime, maxJHeight = 4f, jumpApexTime = .5f, minJHeight;
+    public float maxJPower, minJPower, maxJHeight = 4f, jumpApexTime = .5f, minJHeight;
     [HideInInspector] public Controller contr;
     [HideInInspector] public bool flipped, wallClimbing, crouching;
 
-    public float gravity, speed, fireTimer, iceTimer, invincibleTimer;
+    public float gravity, speed, fireTimer, iceTimer, invincibleTimer, shockTimer;
     public Vector3 velocity; bool hasStatusEffectOn;
-    float wDirX, tarVX, wallStickTimeLeft, iceTimeLeft, fireTimeLeft, invincTimeLeft = 2;
+    float wDirX, tarVX, wallStickTimeLeft, iceTimeLeft, fireTimeLeft, invincTimeLeft = 2, shockTimeLeft;
     public int carryId, hp; public bool carryingItem;
     SpriteRenderer sprite;
     public Color[] colorStates;
-    bool invincible, onFire, iced;
+    bool invincible, onFire, iced, shocked;
     public Vector2 wallKick, wallClimb, dmgBounce, input;
     public static Player Ins;
-    public float f;
 
     private void Awake()
     {
@@ -37,12 +37,9 @@ public class Player : MonoBehaviour
     void Start()
     {
         invincible = flipped = wallClimbing = false;
-        minJHeight = .8f;
         sprite = GetComponent<SpriteRenderer>();
         contr = GetComponent<Controller>();
         JumpHeights(maxJHeight, jumpApexTime, minJHeight);
-
-        speed = 10;
     }
 
     public void OnJumpInputDown()
@@ -74,29 +71,61 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        CalcCooldowns();
+        if (hasStatusEffectOn || invincible) CalcCooldowns();
         CalcVelocity();
         HandleWallSliding();
 
+        if (Input.GetKeyDown(KeyCode.Alpha0)) JumpHeights(maxJHeight, jumpApexTime, minJHeight);
 
         contr.Move(velocity * Time.deltaTime, input);
         if (contr.cols.above || contr.cols.below) velocity.y = 0;
     }
     public void CalcCooldowns()
     {
-        if (invincible && invincTimeLeft <= 0) { invincible = false; invincTimeLeft = invincibleTimer; }
-        else if (invincible && invincTimeLeft > 0) invincTimeLeft -= Time.deltaTime;
+        if (invincible)
+        {
+            if (invincTimeLeft > 0) invincTimeLeft -= Time.deltaTime;
+            else if (invincTimeLeft <= 0)
+            {
+                invincible = false; invincTimeLeft = invincibleTimer;
+                sprite.color = colorStates[3]; hasStatusEffectOn = false;
+            }
+        }
 
-        if (iced && iceTimeLeft > 0)
-        { iceTimeLeft -= Time.deltaTime; if (!invincible) sprite.color = colorStates[4]; }
-        else if (iced && iceTimeLeft <= 0) { iced = false; iceTimeLeft = iceTimer; speed = 10; }
+        if (iced)
+        {
+            if (iceTimeLeft > 0)
+            { iceTimeLeft -= Time.deltaTime; if (!invincible) sprite.color = colorStates[4]; }
+            else if (iceTimeLeft <= 0)
+            {
+                iced = false; iceTimeLeft = iceTimer; speed = 15;
+                sprite.color = colorStates[3]; hasStatusEffectOn = false;
+            }
+        }
+        
+        if (onFire)
+        {
+            if (!invincible && fireTimeLeft > 0)
+            { fireTimeLeft -= Time.deltaTime; sprite.color = colorStates[5]; }
+            else if (fireTimeLeft <= 0)
+            {
+                onFire = false; fireTimeLeft = fireTimer;
+                sprite.color = colorStates[3]; hasStatusEffectOn = false;
+            }
+        }
+        
+        if (shocked)
+        {
+            if (!invincible && shockTimeLeft > 0)
+            { shockTimeLeft -= Time.deltaTime; sprite.color = colorStates[6]; }
+            else if (shockTimeLeft <= 0)
+            {
+                shocked = false; shockTimeLeft = shockTimer;
+                sprite.color = colorStates[3]; hasStatusEffectOn = false;
+            }
+        }
+       
 
-        if (!invincible && onFire && fireTimeLeft > 0)
-        { fireTimeLeft -= Time.deltaTime; sprite.color = colorStates[5]; }
-        else if (onFire && fireTimeLeft <= 0) { onFire = false; fireTimeLeft = fireTimer; }
-
-        if (!invincible && !onFire && !iced)
-        { sprite.color = colorStates[3]; hasStatusEffectOn = false; }
     }
     public void HandleWallSliding()
     {
@@ -148,6 +177,7 @@ public class Player : MonoBehaviour
         if (invincible) { return; }
         invincible = true;
         ani.SetTrigger("Hurt");
+        dmg = shocked ? (int)(dmg * 1.5f) : dmg;
         hp = hp - dmg;
         print($"owch, {hp + dmg} - {dmg} = {hp} health left");
         velocity.y = dmgBounce.y;
@@ -176,6 +206,7 @@ public class Player : MonoBehaviour
                     yield return new WaitForSeconds(1f);
                 }
                 break;
+            case 3: shocked = true; shockTimeLeft = shockTimer; break;
         }
         yield return null;
     }

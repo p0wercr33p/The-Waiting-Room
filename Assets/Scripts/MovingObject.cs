@@ -15,7 +15,7 @@ public class MovingObject : RaycastController
     public ObjectType type;
     [SerializeField]
     int fromWPi; [SerializeField] float perWP;
-    public bool cyclic; 
+    public bool cyclic, walker; 
     Dictionary<Transform, Controller> passport;
     Dictionary<Transform, Throwable> luggage;
     public Color wpcolor;
@@ -50,7 +50,11 @@ public class MovingObject : RaycastController
 
      
         Vector2 dir = new Vector2(enemy.shootDir.y, enemy.shootDir.x);
-        
+        if (walker) { 
+            RaycastHit2D floor = Physics2D.Raycast(transform.position, Vector2.down, 100f, waypointMask);
+            transform.position = floor.point;
+        }
+
         RaycastHit2D hit1 = Physics2D.Raycast(transform.position, dir, 100f, waypointMask);
         RaycastHit2D hit2 = Physics2D.Raycast(transform.position, -dir, 100f, waypointMask);
 
