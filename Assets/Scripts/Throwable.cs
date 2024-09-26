@@ -26,6 +26,7 @@ public class Throwable : RaycastController
     public string projName;
     public enum ItemType { BOMB, BLASTER, HEALING}
     public ItemType type;
+    Obstacle bomb;
     public override void Awake()
     {
         base.Awake();
@@ -40,7 +41,8 @@ public class Throwable : RaycastController
         contr = Controller.Ins;
         playerCol = player.GetComponent<BoxCollider2D>();
         Id = gameObject.GetInstanceID();
-        grabBox = new GrabBox(col.bounds, grabHitBox, player, Id);        
+        grabBox = new GrabBox(col.bounds, grabHitBox, player, Id);
+        if (type == ItemType.BOMB) bomb = GetComponent<Obstacle>();
     }
 
     // Update is called once per frame
@@ -87,7 +89,8 @@ public class Throwable : RaycastController
     public void HandleDestruction(){
         col.enabled = true; beingCarried = false; inRange = false;
         player.carryingItem = false; player.carryId = 0; transform.parent = manager.transform; 
-        gameObject.SetActive(false);
+        if (type != ItemType.BOMB) gameObject.SetActive(false);
+        else { bomb.Explode(); }
     }
     
     void Carry()
@@ -129,7 +132,6 @@ public class Throwable : RaycastController
         if (below || above)
         { velocity.y = velocity.x = 0; }
     }
-
     
     void HorizontalCollision(ref Vector2 velocity)
     {

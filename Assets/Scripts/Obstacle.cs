@@ -13,12 +13,14 @@ public class Obstacle : MonoBehaviour
     public Effect property;
     public ObstacleType type;
     public ObstacleClass classType;
+    Dictionary<Transform, Throwable> itemBook;
+    Dictionary<Transform, HealthData> enemyBook;
 
     private bool isInitialized = false;
     [SerializeField] bool inRange;
     public int effect = 0, dmg, healAmount, index;
     bool active = false, startTimer, healed;
-    public bool hasTimer, hasWayPoins, triggerByKeyPress;
+    public bool hasWayPoins, triggerByKeyPress, enemyTeam;
     public float lifeLeft, lifeTimer;
 
     Throwable throwable;
@@ -30,9 +32,10 @@ public class Obstacle : MonoBehaviour
     private void Awake()
     {
         hitbox = GetComponent<Collider2D>();
-        startTimer = true; active = healed = false;
+        startTimer = lifeTimer > 1; active = healed = false;
         sprite = GetComponent<SpriteRenderer>();
-        
+        itemBook = new();
+        enemyBook = new();
     }
     void Start()
     {
@@ -66,10 +69,10 @@ public class Obstacle : MonoBehaviour
 
     void Update()
     {
-        if (hasTimer && startTimer)
+        if (startTimer)
         {
             lifeLeft -= Time.deltaTime;
-            if (lifeLeft <= 1f)
+            if (lifeLeft <= 0)
             {
                 LifeTimeOver();
             }
@@ -79,7 +82,7 @@ public class Obstacle : MonoBehaviour
     }
     void LifeTimeOver()
     {
-        if (lifeLeft <= 0) { print("nice try"); return; }
+        print("Life Time Over");
         sprite.enabled = false;
         if (type == ObstacleType.BOMB)
         {
@@ -87,7 +90,7 @@ public class Obstacle : MonoBehaviour
         }
         else { 
             startTimer = false;
-            manager.Swap(index);
+            if (index >= 0) manager.Swap(index);
             gameObject.SetActive(false); 
         }
     }
@@ -104,10 +107,9 @@ public class Obstacle : MonoBehaviour
     }
     void Reactivated()
     {
-        lifeLeft = lifeTimer; startTimer = true; sprite.enabled = true;
-    
+        lifeLeft = lifeTimer; startTimer = lifeTimer > 1; sprite.enabled = true;
     }
-    void Explode()
+    public void Explode()
     {
         if (!startTimer) { print("why are you trying to go boom?"); return; }
         print("boom");
@@ -129,7 +131,8 @@ public class Obstacle : MonoBehaviour
         }
         hitbox.enabled = sprite.enabled = triggerByKeyPress;
         this.enabled = triggerByKeyPress;
-        AstarPath.active.Scan();
+        var graphToScan = AstarPath.active.data.gridGraph;
+        AstarPath.active.Scan(graphToScan);
     }
     private void OnTriggerEnter2D(Collider2D coll)
     {
@@ -153,9 +156,19 @@ public class Obstacle : MonoBehaviour
         }
         if (type == ObstacleType.EXPLOSION)
         {
-            if (coll.CompareTag("Item")) coll.GetComponent<Obstacle>().LifeTimeOver();
-            else if (coll.CompareTag("Throwable")) coll.GetComponent<Throwable>().HandleDestruction();
-            else if (coll.CompareTag("Enemy")) coll.GetComponent<Enemy>().TakeDamage(dmg);
+            if (coll.CompareTag("Item"))
+            {
+                if (!itemBook.ContainsKey(coll.transform))
+                    itemBook[coll.transform] = coll.GetComponent<Throwable>();
+                itemBook[coll.transform].HandleDestruction();
+            }
+            else if (coll.CompareTag("Bomb")) coll.GetComponent<Throwable>().HandleDestruction();
+            else if (!enemyTeam && coll.CompareTag("Enemy"))
+            {
+                if (!enemyBook.ContainsKey(coll.transform))
+                    enemyBook[coll.transform] = coll.GetComponent<HealthData>();
+                enemyBook[coll.transform].TakeDamage(dmg);
+            }
         }
         healed = true;
     }

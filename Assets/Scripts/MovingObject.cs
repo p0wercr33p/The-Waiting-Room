@@ -21,6 +21,7 @@ public class MovingObject : RaycastController
     public Color wpcolor;
     public SpriteRenderer sprite;
     Enemy enemy;
+    Vector2 scale, curScale;
     List<PassengerMovement> pMovement;
     public bool global;
 
@@ -36,35 +37,50 @@ public class MovingObject : RaycastController
         passport = new();
         luggage = new();
         col = GetComponent<BoxCollider2D>();
+        scale = curScale = transform.localScale;
         switch (type)
         {
-            case ObjectType.PLATFORM: wpcolor = Color.green; break;
-            case ObjectType.ENEMY: SetEnemyWayPoints(); wpcolor = Color.red; break;
+            case ObjectType.PLATFORM: wpcolor = Color.green; SetWaypoints(); break;
+            case ObjectType.ENEMY: wpcolor = Color.red; SetEnemyWayPoints(); break;
             case ObjectType.ITEM: wpcolor = Color.yellow; break;
         }
         sprite.enabled = true;
     }
+    void SetWaypoints()
+    {
+        globalWP = new Vector3[waypoints.Length];
+        for (int i = 0; i < waypoints.Length; i++)
+        {
+            globalWP[i] = global ? waypoints[i] : waypoints[i] + transform.position;
+        }
+    }
     public void SetEnemyWayPoints()
     {
-        enemy = GetComponent<Enemy>();
+        if (!walker) enemy = GetComponent<Enemy>();
+        string walkr = walker ? "a walker" : "not a walker";
 
-     
-        Vector2 dir = new Vector2(enemy.shootDir.y, enemy.shootDir.x);
-        if (walker) { 
-            RaycastHit2D floor = Physics2D.Raycast(transform.position, Vector2.down, 100f, waypointMask);
-            transform.position = floor.point;
+        Vector2 dir = Vector2.left, point = transform.position;
+        if (!walker) { dir = new Vector2(enemy.shootDir.y, enemy.shootDir.x); }
+        else
+        {
+            Vector2 rayOrigin = point;
+            RaycastHit2D floor = Physics2D.Raycast(rayOrigin, Vector2.down, 150f, waypointMask);
+            transform.position = new Vector2(floor.point.x, floor.point.y + 0.05f);
+            point = transform.position;
         }
+        RaycastHit2D hit1 = Physics2D.Raycast(point, dir, 100f, waypointMask);
+        RaycastHit2D hit2 = Physics2D.Raycast(point, -dir, 100f, waypointMask);
 
-        RaycastHit2D hit1 = Physics2D.Raycast(transform.position, dir, 100f, waypointMask);
-        RaycastHit2D hit2 = Physics2D.Raycast(transform.position, -dir, 100f, waypointMask);
+
 
         float hitPointX1 = dir.x == 0 ? hit1.point.x : hit1.point.x - dir.x;
         float hitPointY1 = dir.y == 0 ? hit1.point.y : hit1.point.y - dir.y;
         float hitPointX2 = dir.x == 0 ? hit2.point.x : hit2.point.x + dir.x;
         float hitPointY2 = dir.y == 0 ? hit2.point.y : hit2.point.y + dir.y;
 
+
         waypoints = new Vector3[3];
-        waypoints[0] = transform.position;
+        waypoints[0] = point;
         waypoints[1] = new Vector2(hitPointX1, hitPointY1);
         waypoints[2] = new Vector2(hitPointX2, hitPointY2);
 
@@ -73,7 +89,7 @@ public class MovingObject : RaycastController
         {
             globalWP[i] = global ? waypoints[i] : waypoints[i] + transform.position;
         }
-        enemy.Rotate();
+        if (!walker) enemy.Rotate();
     }
     void Update()
     {
@@ -102,6 +118,14 @@ public class MovingObject : RaycastController
             if (!cyclic && fromWPi >= waypoints.Length - 1){
                 fromWPi = 0;
                 System.Array.Reverse(globalWP);
+            }
+            else if (cyclic && walker)
+            {
+                if (fromWPi == 1 || fromWPi == 2)
+                {
+                    curScale.x *= -1;
+                    transform.localScale = curScale;
+                }   
             }
         }
         return newPos - (Vector2)transform.position;

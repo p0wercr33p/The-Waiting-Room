@@ -12,19 +12,20 @@ public class Player : MonoBehaviour
 {
     Animator ani;
     float vXSmoothing, wallStickTime;
-    [HideInInspector] public float accel = .2f, wallSp, airAccel = .1f; 
-    [HideInInspector] public float[] jumpData = new float[] { 4, .5f, 2, .25f, 9, 1.2f };
+    [HideInInspector] private float accel = .2f, wallSp, airAccel = .1f; 
+    [HideInInspector] private float[] jumpData = new float[] { 4, .5f, 2, .25f, 9, 1.2f };
     public float maxJPower, minJPower, maxJHeight = 4f, jumpApexTime = .5f, minJHeight;
     [HideInInspector] public Controller contr;
     [HideInInspector] public bool flipped, wallClimbing, crouching;
 
-    public float gravity, speed, fireTimer, iceTimer, invincibleTimer, shockTimer;
-    public Vector3 velocity; bool hasStatusEffectOn;
-    float wDirX, tarVX, wallStickTimeLeft, iceTimeLeft, fireTimeLeft, invincTimeLeft = 2, shockTimeLeft;
-    public int carryId, hp; public bool carryingItem;
+    [SerializeField] private float gravity, speed, fireTimer, iceTimer, invincibleTimer, shockTimer, shockTimeLeft;
+    [SerializeField] private Vector3 velocity;
+    private float wDirX, tarVX, wallStickTimeLeft, iceTimeLeft, fireTimeLeft, invincTimeLeft = 2;
+    public int carryId, hp, maxHp; 
+    private bool hasStatusEffectOn, invincible, onFire, iced;
     SpriteRenderer sprite;
     public Color[] colorStates;
-    bool invincible, onFire, iced, shocked;
+    public bool shocked, carryingItem;
     public Vector2 wallKick, wallClimb, dmgBounce, input;
     public static Player Ins;
 
@@ -40,6 +41,7 @@ public class Player : MonoBehaviour
         sprite = GetComponent<SpriteRenderer>();
         contr = GetComponent<Controller>();
         JumpHeights(maxJHeight, jumpApexTime, minJHeight);
+        hp = maxHp;
     }
 
     public void OnJumpInputDown()
@@ -79,6 +81,7 @@ public class Player : MonoBehaviour
 
         contr.Move(velocity * Time.deltaTime, input);
         if (contr.cols.above || contr.cols.below) velocity.y = 0;
+        if (contr.cols.left || contr.cols.right) velocity.x = 0;
     }
     public void CalcCooldowns()
     {
@@ -88,7 +91,7 @@ public class Player : MonoBehaviour
             else if (invincTimeLeft <= 0)
             {
                 invincible = false; invincTimeLeft = invincibleTimer;
-                sprite.color = colorStates[3]; hasStatusEffectOn = false;
+                sprite.color = colorStates[3];
             }
         }
 
@@ -99,7 +102,7 @@ public class Player : MonoBehaviour
             else if (iceTimeLeft <= 0)
             {
                 iced = false; iceTimeLeft = iceTimer; speed = 15;
-                sprite.color = colorStates[3]; hasStatusEffectOn = false;
+                sprite.color = colorStates[4]; hasStatusEffectOn = false;
             }
         }
         
@@ -208,7 +211,6 @@ public class Player : MonoBehaviour
                 break;
             case 3: shocked = true; shockTimeLeft = shockTimer; break;
         }
-        yield return null;
     }
     IEnumerator DamagedColors()
     {
@@ -220,7 +222,9 @@ public class Player : MonoBehaviour
             sprite.color = colorStates[1];
             yield return new WaitForSeconds(.25f);
         }
+        sprite.color = colorStates[3];
     }
+    private void OnEnable() => hp = maxHp;
     public void Die() => gameObject.SetActive(false);
 }
 

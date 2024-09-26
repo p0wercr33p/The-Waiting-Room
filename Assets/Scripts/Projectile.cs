@@ -7,40 +7,51 @@ using static Unity.Burst.Intrinsics.X86.Avx;
 
 public class Projectile : MonoBehaviour
 {
-    public float speed, life, lifeLeft;
+    public float speed, life, distance;
     public int dmg, dmgVsEnemies, effect;
-    [HideInInspector] public float rotate;
+    float lifeLeft;
     public Rigidbody2D rb; 
-    Player player; 
-    string playerTag, enemyTag, obstacleTag, groundTag;
+    Player player; Transform plT;
+    string playerTag, enemyTag, obstacleTag, groundTag, itemTag;
     public enum Team { PLAYER, ENEMY, NEITHER };
     public Team team; 
     bool active;
     BoxCollider2D hitbox;
     bool isInstantiated;
     [SerializeField] private AIPath aiPath;
-    public Vector2 scale, explosionScale;
     Animator ani;
-    public Vector2 defaultHitboxSize = new Vector2(1, 1);
-    public Vector2 explosionHitboxSize = new Vector2(3, 3);
-    public bool heetSeeking;
-    Dictionary<Transform, Enemy> enemyBook;
-    
+    public GameObject explosionPrefab;
+    GameObject explosion;
+
+    public bool heetSeeking, trigger;
+    Dictionary<Transform, HealthData> enemyBook;
+    Dictionary<Transform, Throwable> itemBook;
+    public string projTypeName;
+
+
+    private void Awake()
+    {
+        hitbox = GetComponent<BoxCollider2D>();
+        rb = GetComponent<Rigidbody2D>();
+    }
     void Start()
     { 
         player = Player.Ins;
+        plT = player.transform;
         enemyTag = "Enemy"; 
         playerTag = "Player";
         obstacleTag = "Obstacle";
         groundTag = "Ground";
-        hitbox = GetComponent<BoxCollider2D>();
+        itemTag = "Item";
+        
         active = true;
         if (heetSeeking) Invoke("SetTeamToNeither", 0.3f);
         if (ani == null) ani = GetComponent<Animator>();
-        enemyBook = new Dictionary<Transform, Enemy>();
-        scale = transform.localScale;
-        explosionScale = new Vector2((scale.x*1.4f)+.5f, (scale.y * 1.4f) + .5f);
-        rb = GetComponent<Rigidbody2D>(); 
+        enemyBook = new Dictionary<Transform, HealthData>();
+        if (explosionPrefab != null){
+            explosion = Instantiate(explosionPrefab, GameObject.FindGameObjectWithTag("ProjectileHolder").transform);
+            explosion.SetActive(false);
+        }
         lifeLeft = life;
     }
 
@@ -50,21 +61,30 @@ public class Projectile : MonoBehaviour
     {
         lifeLeft -= Time.deltaTime;
         if (lifeLeft <= 0){
-            print($"My time on this planet is over");
             Explode();
-            rb.velocity = Vector2.zero;
+        }
+        if (trigger)
+        {
+            float dist = Vector2.Distance(transform.position, plT.position);
+            if (dist < distance)
+                Explode();
         }
     }
     void Explode()
     {
+        rb.velocity = Vector2.zero;
         if (ani == null) gameObject.SetActive(false);
         else
         {
             if (heetSeeking) aiPath.enabled = false;
-            hitbox.size = explosionHitboxSize;
-            ani.SetTrigger("Explode");
-            transform.localScale = explosionScale;
+            string explode = "Explode";
+            ani.SetTrigger(explode);
         }
+    }
+    public void SpawnExplosion()
+    {
+        explosion.transform.position = transform.position;
+        explosion.SetActive(true);
     }
     private void OnEnable()
     {
@@ -78,7 +98,6 @@ public class Projectile : MonoBehaviour
             Invoke("SetTeamToNeither", 0.3f);
         }
         lifeLeft = life; hitbox.enabled = true; active = true;
-        transform.localScale = scale;
     }
 
     public void SwitcHitboxActiveState()
@@ -87,7 +106,6 @@ public class Projectile : MonoBehaviour
         hitbox.enabled = active;
     }
     public void BulletLifeOver(){
-        hitbox.size = defaultHitboxSize;
         if (heetSeeking) team = Team.ENEMY;
         gameObject.SetActive(false);
     }
@@ -97,20 +115,27 @@ public class Projectile : MonoBehaviour
         bool enemy = coll.CompareTag(enemyTag);
         bool obs = coll.CompareTag(obstacleTag);
         bool gr = coll.CompareTag(groundTag);
+
         print($"Hit da {coll.tag} -- {coll.name} --- {pl}-{enemy}-{obs}-{gr}");
 
         if ((team == Team.ENEMY || team == Team.NEITHER) && pl) {
-            player.TakeDamage(dmg, effect); Explode();
-            rb.velocity = Vector2.zero;
-            print("enemy check");
+            if (!trigger) player.TakeDamage(dmg, effect); 
+            Explode();
+            
         } else if ((team == Team.PLAYER || team == Team.NEITHER) && enemy) {
             if (!enemyBook.ContainsKey(coll.transform))
-                enemyBook[coll.transform] = coll.GetComponent<Enemy>();
+                enemyBook[coll.transform] = coll.GetComponent<HealthData>();
             enemyBook[coll.transform].TakeDamage(dmgVsEnemies); 
             Explode();
-            print("player check");
-            rb.velocity = Vector2.zero;
+            
         }
-        if (obs || gr) { print("ground check"); Explode(); rb.velocity = Vector2.zero; }
+        if (obs || gr) Explode();
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+
+        if (distance > 0) Gizmos.DrawWireSphere(transform.position, distance);
     }
 }

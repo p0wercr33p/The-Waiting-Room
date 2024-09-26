@@ -8,15 +8,21 @@ public class ObjectBank : MonoBehaviour
     [Header("Hazards")]
     public GameObject iceSaws;
     public GameObject saws;
-    public GameObject spikes;
     public GameObject heavensFury;
-    public GameObject freezeBlast, fire, bombs, fireSaws;
+    public GameObject freezeBlast;
+    public GameObject bombs;
+    public GameObject fireSaws;
 
     [Header("Items")]
     public GameObject pBlaster;
     public GameObject sBlaster;
     public GameObject heart, troll;
 
+    [Header("Enemies")]
+    public GameObject groundDroid;
+    public GameObject stormHead;
+    public GameObject rocketDroid;
+    public GameObject droid;
 
     [Header("HazardsInfo")]
     public int maxFuries;
@@ -26,15 +32,14 @@ public class ObjectBank : MonoBehaviour
     Dictionary<string, int> hazardCounts;
     Dictionary<string, int> maxHazardCounts;
   
-    public Dictionary<GameObject, (MovingObject move, Enemy en)> cannonsInfo;
-    public List<(GameObject obj, Obstacle obs, Throwable thr)> bombsInfo;
-    public List<(GameObject obj, Obstacle obs)> sawsInfo;
-    public List<(GameObject obj, Obstacle obs)> iceSawsInfo;
-    public List<(GameObject obj, Obstacle obs)> fireSawsInfo;
-    public List<GameObject[]> level;
-    public List<GameObject[]> lvlItems;
-    string[] hazardTypes;
 
+    public Dictionary<GameObject, bool> nul;
+    public Dictionary<GameObject, Projectile> droidBullet;
+    public GameObject[] lvlHazards;
+    public GameObject[] lvlItems;
+    public GameObject[] lvlEnemies;
+    string[] hazardTypes;
+    GameObject me;
     GameObject[] allHazards, allItems, allObjs;
     GameObject[] availableHazards;
 
@@ -42,10 +47,10 @@ public class ObjectBank : MonoBehaviour
     void Awake()
     {
         InitializeHazardCounts();
-        AddLevelHazardsInfo();
+        AddObjectsInfo();
         Trollololo();
-        AddLevelItemsInfo();
     }
+
     void Trollololo()
     {
         allHazards = new GameObject[] { fireSaws, saws, iceSaws, bombs, freezeBlast, heavensFury };
@@ -79,20 +84,17 @@ public class ObjectBank : MonoBehaviour
             { "FreezeBlast", maxBlasts }
         };
     }
-    void AddLevelHazardsInfo()
+    void AddObjectsInfo()
     {
-        level = new List<GameObject[]>()
-        {
-            new GameObject[] { bombs },
-            new GameObject[] { iceSaws, saws, fireSaws, bombs, heavensFury, freezeBlast },
-            new GameObject[] { iceSaws, saws, fireSaws }
-        };
+        lvlEnemies = new GameObject[] { droid, rocketDroid, stormHead, groundDroid};
+        lvlItems = new GameObject[] { sBlaster, heart, pBlaster, troll };
+        lvlHazards = new GameObject[] { iceSaws, saws, fireSaws, bombs, heavensFury, freezeBlast };
         hazardTypes = new string[] { "Saws", "Saws", "Saws", "Bombs", "HeavensFury", "FreezeBlast" };
     }
 
-    public GameObject MakeHazard(int lvl)
+    public (GameObject,string) MakeHazard()
     {
-        int count = level[lvl].Count();
+        int count = lvlHazards.Count();
         int stI = Random.Range(0, count);
 
         for (int i = stI; i < count; i++)
@@ -101,8 +103,7 @@ public class ObjectBank : MonoBehaviour
             if (hazardCounts[hazardType] < maxHazardCounts[hazardType])
             {
                 hazardCounts[hazardType]++;
-                print($"return {level[lvl][i].name}");
-                return level[lvl][i];
+                return (lvlHazards[i], hazardTypes[i]);
             }
         }
         for (int i = stI-1; i >= 0; i--)
@@ -111,19 +112,9 @@ public class ObjectBank : MonoBehaviour
             if (hazardCounts[hazardType] < maxHazardCounts[hazardType])
             {
                 hazardCounts[hazardType]++;
-                print($"return {level[lvl][i].name}");
-                return level[lvl][i];
+                return (lvlHazards[i], hazardTypes[i]);
             }
         }
-        return saws;
+        return (saws, "Saws");
     }
-    void AddLevelItemsInfo()
-    {
-        lvlItems = new List<GameObject[]>();
-        lvlItems.Add(new GameObject[] { heart });
-        lvlItems.Add(new GameObject[] { sBlaster, heart, pBlaster, troll });
-        lvlItems.Add(new GameObject[] { heart, sBlaster });
-    }
-    
-    
 }

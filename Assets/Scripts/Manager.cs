@@ -11,20 +11,16 @@ public class Manager : MonoBehaviour
     public static Manager Ins;
     Player player;
     ObjectBank bank;
-    public Enemy enemy;
-    public Slider curSlider;
+    ObjectManager Jim;
     public GameObject[] cannonPicker;
     Dictionary<GameObject, Enemy> enemyDict;
     Dictionary<GameObject, Obstacle> obsDict;
-    Dictionary<GameObject, MovingObject> waypointDict;
     [HideInInspector]
-    public GameObject[] hazards, warnings, headsUps, items, cannons;
-    public GameObject warning, headsUp;
-    public Vector2[] hazardPoints, itemPoints; 
+    public GameObject[] hazards, warnings, headsUps, items, cannons, enemies, cannonSigns, enemySigns;
+    public GameObject warning, headsUp, cannonSign, enemySign;
+    public Vector2[] hazardPoints, itemPoints, enemyPoints; 
     public CannonData[] cannonData;
-    public int levelHazards, levelItems, levelCannons;
-    public int lvl;
-    public float maxTime, milestoneTime; float timePassed, nextMilestone;
+    int levelHazards, levelItems, levelCannons, levelEnemies;
     public bool draw;
 
     private void Awake()
@@ -36,29 +32,20 @@ public class Manager : MonoBehaviour
     {
         StartLevel();
         player = Player.Ins;
-        nextMilestone = milestoneTime;
-        if (curSlider != null)
-        {
-            InitializeSlider();
-        }
-    }
-    public void InitializeSlider()
-    {
-        if (curSlider != null)
-        {
-            curSlider.maxValue = maxTime;
-            curSlider.value = 0;
-        }
+        Jim = ObjectManager.Ins;
     }
     void StartLevel()
     {
         enemyDict = new();
-        waypointDict = new();
+        obsDict = new();
         bank = GetComponent<ObjectBank>();
         levelHazards = hazardPoints.Length;
         levelItems = itemPoints.Length;
-        obsDict = new Dictionary<GameObject, Obstacle>();
         levelCannons = cannonData.Length;
+        levelEnemies = enemyPoints.Length;
+        cannonSigns = new GameObject[levelCannons];
+        enemySigns = new GameObject[levelEnemies];
+        enemies = new GameObject[levelEnemies];
         warnings = new GameObject[levelHazards];
         hazards = new GameObject[levelHazards];
         items = new GameObject[levelItems];
@@ -72,23 +59,22 @@ public class Manager : MonoBehaviour
             w.transform.position = hazardPoints[i];
             warnings[i] = w;
             w.SetActive(false);
-           
-            GameObject h = Instantiate(bank.MakeHazard(lvl), this.transform);
-            print(h.name);
+            (GameObject make, string type) = bank.MakeHazard();
+            GameObject h = Instantiate(make, this.transform);
             h.transform.position = hazardPoints[i];
             hazards[i] = h;
             obsDict[h] = h.GetComponent<Obstacle>();
             obsDict[h].index = i;
             h.SetActive(false);
+            Jim.AddObject(h, type, "Hazard");
         }
         for (int i = 0; i < levelItems; i++)
         {
             GameObject h = Instantiate(headsUp, transform);
             h.transform.position = itemPoints[i];
             headsUps[i] = h;
-            h.SetActive(false); int ran = Random.Range(0, bank.lvlItems[lvl].Length);
-            GameObject it = Instantiate(bank.lvlItems[lvl][ran], transform);
-            print(it.name);
+            h.SetActive(false); int ran = Random.Range(0, bank.lvlItems.Length);
+            GameObject it = Instantiate(bank.lvlItems[ran], transform);
             h.name = $"HeadsUp! {it.name} {i}";
             it.transform.position = itemPoints[i];
             items[i] = it; it.SetActive(false);
@@ -96,13 +82,15 @@ public class Manager : MonoBehaviour
         
         for (int i = 0; i < levelCannons; i++)
         {
+            GameObject cSign = Instantiate(cannonSign, transform);
+            cSign.transform.position = cannonData[i].pos;
+            cannonSigns[i] = cSign; cSign.SetActive(false);
             int ran = Random.Range(0, c);
             GameObject cannon = Instantiate(cannonPicker[ran], transform);
             cannons[i] = cannon;
             enemyDict[cannon] = cannon.GetComponent<Enemy>();
             cannon.transform.position = cannonData[i].pos;
-            bool wp = enemyDict[cannon].hasWayPoints;
-            if (wp) { waypointDict[cannon] = cannon.GetComponent<MovingObject>();}
+            Jim.AddObject(cannon, enemyDict[cannon].typeName, "Cannon");
             switch (cannonData[i].shootDir.ToLower())
             {
                 case "up":
@@ -125,7 +113,15 @@ public class Manager : MonoBehaviour
             cannon.SetActive(false);
         }
 
-       
+        for (int i = 0; i < levelEnemies; i++)
+        {
+            GameObject eSign = Instantiate(enemySign, transform);
+            eSign.transform.position = enemyPoints[i];
+            enemySigns[i] = eSign; eSign.SetActive(false);
+
+            int ran = Random.Range(0, bank.lvlEnemies.Length);
+            GameObject e = Instantiate(bank.lvlEnemies[ran], transform);
+        }
     }
     (GameObject, GameObject, int) FindHazard(int stI)
     {
@@ -217,25 +213,31 @@ public class Manager : MonoBehaviour
             hazards[ind1] = h;
         }
     }
-    GameObject FindCannon(int stI)
+    (GameObject, GameObject) FindCannon(int stI)
     {
         for (int i = stI; i < levelCannons; i++)
             if (!cannons[i].activeInHierarchy)
-                return cannons[i];
+                return (cannons[i], cannonSigns[i]);
 
         for (int i = stI; i >= 0; i--)
             if (!cannons[i].activeInHierarchy)
-                return cannons[i];
+                return (cannons[i], cannonSigns[i]);
 
-        return null;
+        return (null, null);
     }
-    void SpawnCannon()
+    IEnumerator SpawnCannon()
     {
         int stI = Random.Range(0, cannons.Length);
-        GameObject cannon = FindCannon(stI);
+        (GameObject cannon, GameObject sign) = FindCannon(stI);
 
         if (cannon != null)
+        {
+            sign.SetActive(true);
+            yield return new WaitForSeconds(2.4f);
+            sign.SetActive(false);
             cannon.SetActive(true);
+        }
+ 
     }
     // Update is called once per frame
     void Update()
@@ -244,23 +246,19 @@ public class Manager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.O)) player.ChangeGravity(1);
         if (Input.GetKeyDown(KeyCode.I)) player.ChangeGravity(2);
         if (Input.GetKeyDown(KeyCode.U)) player.ChangeGravity(3);
-        if (enemy != null && Input.GetKeyDown(KeyCode.L)) enemy.TakeDamage(1);
         if (Input.GetKeyDown(KeyCode.K)) StartCoroutine(SpawnHazards());
         if (Input.GetKeyDown(KeyCode.M)) StartCoroutine(SpawnItems());
-        if (Input.GetKeyDown(KeyCode.C)) SpawnCannon();
+        if (Input.GetKeyDown(KeyCode.C)) StartCoroutine(SpawnCannon());
   
     }
+
     void HandleTimedEvents()
     {
-        if (curSlider == null) return;
-     
-        if (timePassed <= maxTime)
+        if (levelEnemies == 999)
         {
-            timePassed += Time.deltaTime;
-            curSlider.value = timePassed;
-            if (timePassed >= nextMilestone)
+            if (levelCannons == 998)
             {
-                nextMilestone += milestoneTime;
+
                 int ran = Random.Range(1, 4);
                 for (int i = 0; i < ran; i++)
                 {

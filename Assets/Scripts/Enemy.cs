@@ -21,14 +21,15 @@ public class Enemy : MonoBehaviour
 
     float maxLaserDist = 80f, laserTimeLeft;
     int colorInd = 0;
-    public int dmg, cap, contactDmg, hp;
+    public int cap, contactDmg;
     public float timeLeft, cooldown;
     public float laserTime;
     public bool aimAtPlayer, hasWayPoints, lookAtShootDir, hasFollowAI, inShootRange;
     private bool isInitialized;
     public Vector2 shootDir;
-    [SerializeField] bool canAttack, attacking;
+    [SerializeField] public bool canAttack, attacking;
     [SerializeField] Transform firePoint;
+    public string typeName;
 
     private void Awake(){
         spR = GetComponent<SpriteRenderer>();
@@ -96,7 +97,6 @@ public class Enemy : MonoBehaviour
         else if (canAttack && !attacking && inShootRange)
         {
             canAttack = false;
-            print("attacking");
             attacking = true;
             ani.SetTrigger("AttackStartUp");
         }
@@ -107,10 +107,8 @@ public class Enemy : MonoBehaviour
 
         if (bullet == BulletType.PROJECTILE) Shoot(dir);
         else if (bullet == BulletType.LASER) StartCoroutine(HoldLaserFire(shootDir));
-
     }
     public IEnumerator HoldLaserFire(Vector2 dir){
-        print("holding down laser fire");
         attacking = true;
         laserTimeLeft = laserTime;
 
@@ -129,13 +127,11 @@ public class Enemy : MonoBehaviour
     }
 
     void ShootLaser(Vector2 dir){
-        print("firing da laser");
         RaycastHit2D laserHit = Physics2D.Raycast((Vector2)firePoint.position, dir, maxLaserDist, laserMask);
 
         if (laserHit){
-            print($"hit {laserHit.transform.name} (its tag --> {laserHit.transform.tag}");
             DrawLaser(firePoint.position, laserHit.point);
-            if (laserHit.transform.tag == playerTag) player.TakeDamage(dmg);
+            if (laserHit.transform.tag == playerTag) player.TakeDamage(contactDmg);
         }else{
             Vector2 endPos = (Vector2)transform.position + dir * maxLaserDist;
             DrawLaser(firePoint.position, endPos);
@@ -181,28 +177,14 @@ public class Enemy : MonoBehaviour
         else print("couldn't find a prjectile");
         attacking = false;
     }
-    public void TakeDamage(int dmg){
-        hp -= dmg;
-        if (type == EnemyType.DUMMY){
-            spR.color = dummyRainbow[colorInd];
-            print($"OUCH!!!! *blush*  you did ----  {dmg}  ---- Damage ");
-            colorInd = (colorInd + 1) % dummyRainbow.Length;
-        }
-        if (hp <= 0) Die();
-    }
-
     private void OnEnable(){
         if (isInitialized) Reactivated();
         else isInitialized = true;
     }
     void Reactivated()
     {
-        spR.enabled = true;
-    }
-    void Die()
-    {
-        if (type == EnemyType.DUMMY) return;
-        gameObject.SetActive(false);
+        spR.enabled = true; canAttack = false; timeLeft = cooldown;
+        attacking = false;
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {

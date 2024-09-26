@@ -161,10 +161,8 @@ MonoBehaviour:
   - {r: 1, g: 1, b: 1, a: 1}
   spR: {fileID: 0}
   laserLine: {fileID: 0}
-  dmg: 0
   cap: 99
   contactDmg: 0
-  hp: 999
   timeLeft: 0
   cooldown: 1000
   laserTime: 0
@@ -174,4 +172,6 @@ MonoBehaviour:
   hasFollowAI: 0
   inShootRange: 0
   shootDir: {x: 0, y: 0}
+  canAttack: 0
+  attacking: 0
   firePoint: {fileID: 0}
