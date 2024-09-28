@@ -30,9 +30,9 @@ public class Manager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Jim = GetComponent<ObjectManager>();
         StartLevel();
         player = Player.Ins;
-        Jim = ObjectManager.Ins;
     }
     void StartLevel()
     {
@@ -65,8 +65,8 @@ public class Manager : MonoBehaviour
             hazards[i] = h;
             obsDict[h] = h.GetComponent<Obstacle>();
             obsDict[h].index = i;
-            h.SetActive(false);
             Jim.AddObject(h, type, "Hazard");
+            h.SetActive(false);
         }
         for (int i = 0; i < levelItems; i++)
         {
@@ -90,7 +90,6 @@ public class Manager : MonoBehaviour
             cannons[i] = cannon;
             enemyDict[cannon] = cannon.GetComponent<Enemy>();
             cannon.transform.position = cannonData[i].pos;
-            Jim.AddObject(cannon, enemyDict[cannon].typeName, "Cannon");
             switch (cannonData[i].shootDir.ToLower())
             {
                 case "up":
@@ -111,6 +110,7 @@ public class Manager : MonoBehaviour
                     break;
             }
             cannon.SetActive(false);
+            Jim.AddObject(cannon, enemyDict[cannon].typeName, "Cannon");
         }
 
         for (int i = 0; i < levelEnemies; i++)
@@ -121,6 +121,10 @@ public class Manager : MonoBehaviour
 
             int ran = Random.Range(0, bank.lvlEnemies.Length);
             GameObject e = Instantiate(bank.lvlEnemies[ran], transform);
+            e.transform.position = enemyPoints[i];
+            enemies[i] = e;
+            e.SetActive(false);
+            Jim.AddObject(e, bank.enemyNames[ran], "Droid");
         }
     }
     (GameObject, GameObject, int) FindHazard(int stI)
@@ -135,7 +139,7 @@ public class Manager : MonoBehaviour
 
         return (null, null,0);
     }
-    IEnumerator SpawnHazards()
+    IEnumerator SpawnHazard()
     {
         int stI = Random.Range(0, hazards.Length);
         (GameObject h, GameObject w,int i) = FindHazard(stI);
@@ -173,9 +177,33 @@ public class Manager : MonoBehaviour
             hU.SetActive(false);
             it.SetActive(true);
         }
-
     }
+    (GameObject, GameObject, int) FindEnemy(int stI)
+    {
+        for (int i = stI; i < levelItems; i++)
+            if (!enemies[i].activeInHierarchy && !enemySigns[i].activeInHierarchy)
+                return (enemies[i], enemySigns[i], i);
 
+        for (int i = stI - 1; i >= 0; i--)
+            if (!enemies[i].activeInHierarchy && !enemySigns[i].activeInHierarchy)
+                return (enemies[i], enemySigns[i], i);
+
+        return (null, null, 0);
+    }
+    IEnumerator SpawnEnemy()
+    {
+        int stI = Random.Range(0, enemies.Length);
+        (GameObject en, GameObject eS, int i) = FindEnemy(stI);
+
+        if (en != null)
+        {
+            en.transform.position = enemyPoints[i];
+            eS.SetActive(true);
+            yield return new WaitForSeconds(2.4f);
+            eS.SetActive(false);
+            en.SetActive(true);
+        }
+    }
     (GameObject, int) FindHazardToSwapWith(int stI, int swapInd)
     {
         for (int i = stI; i < levelHazards; i++)
@@ -237,37 +265,22 @@ public class Manager : MonoBehaviour
             sign.SetActive(false);
             cannon.SetActive(true);
         }
- 
     }
+
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.P)) player.ChangeGravity(0);
-        if (Input.GetKeyDown(KeyCode.O)) player.ChangeGravity(1);
-        if (Input.GetKeyDown(KeyCode.I)) player.ChangeGravity(2);
-        if (Input.GetKeyDown(KeyCode.U)) player.ChangeGravity(3);
-        if (Input.GetKeyDown(KeyCode.K)) StartCoroutine(SpawnHazards());
+        if (Input.GetKeyDown(KeyCode.K)) StartCoroutine(SpawnHazard());
         if (Input.GetKeyDown(KeyCode.M)) StartCoroutine(SpawnItems());
         if (Input.GetKeyDown(KeyCode.C)) StartCoroutine(SpawnCannon());
-  
+        if (Input.GetKeyDown(KeyCode.T)) StartCoroutine(SpawnEnemy());
     }
 
-    void HandleTimedEvents()
+    public void HandleTimedEvents(int eventI)
     {
-        if (levelEnemies == 999)
-        {
-            if (levelCannons == 998)
-            {
-
-                int ran = Random.Range(1, 4);
-                for (int i = 0; i < ran; i++)
-                {
-                    int newRan = Random.Range(0, 6);
-                    if (newRan >= 4) StartCoroutine(SpawnItems());
-                    else StartCoroutine(SpawnHazards());
-                }
-            }
-        }
+        if (eventI == 0) StartCoroutine(SpawnEnemy());
+        else if (eventI == 1) StartCoroutine(SpawnHazard());
+        else if (eventI == 2) StartCoroutine(SpawnCannon());
     }
 
     [System.Serializable]
@@ -276,7 +289,7 @@ public class Manager : MonoBehaviour
         public Vector2 pos;
         public string shootDir; // Can be "left", "right", "up", or "down"
     }
-
+   
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.cyan;
@@ -300,6 +313,13 @@ public class Manager : MonoBehaviour
             if (draw) break;
             Gizmos.DrawLine(cannonData[i].pos - Vector2.up * .4f, cannonData[i].pos + Vector2.up * .4f);
             Gizmos.DrawLine(cannonData[i].pos - Vector2.left * .4f, cannonData[i].pos + Vector2.left * .4f);
+        }
+        Gizmos.color = Color.red;
+        for (int i = 0; i < enemyPoints.Length; i++)
+        {
+            if (draw) break;
+            Gizmos.DrawLine(enemyPoints[i] - Vector2.up * .4f, enemyPoints[i] + Vector2.up * .4f);
+            Gizmos.DrawLine(enemyPoints[i] - Vector2.left * .4f, enemyPoints[i] + Vector2.left * .4f);
         }
     }
 }

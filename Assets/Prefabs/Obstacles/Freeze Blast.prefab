@@ -85,7 +85,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!50 &2492827620453453626
@@ -170,9 +170,9 @@ MonoBehaviour:
   dmg: 0
   healAmount: 0
   index: 0
-  hasTimer: 0
   hasWayPoins: 0
   triggerByKeyPress: 0
+  enemyTeam: 0
   lifeLeft: 2
   lifeTimer: 2
   triggerObjs: []

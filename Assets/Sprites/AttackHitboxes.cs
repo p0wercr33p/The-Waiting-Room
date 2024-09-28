@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using static Enemy;
+using static ObjectManager._Cannons;
 using static Unity.Burst.Intrinsics.X86.Avx;
 
 public class AttackHitboxes : MonoBehaviour
@@ -20,9 +21,10 @@ public class AttackHitboxes : MonoBehaviour
     [SerializeField] public AggroBox aggro;
     [SerializeField] public int dmg, effect, cap;
     Player player;
-    [SerializeField] float timeLeft, attackTime;
+    [HideInInspector] public float timeLeft, cooldown;
     [SerializeField] private Transform drawPoint,firePoint;
-    [SerializeField] bool inRange, draw, canAttack, attacking, hasAggroBox;
+    bool inRange, canAttack, attacking;
+    public bool hasAggroBox, draw;
     public Color aggroBoxColor;
     Animator ani;
  
@@ -36,7 +38,7 @@ public class AttackHitboxes : MonoBehaviour
         ani = GetComponent<Animator>();
         nLength = hitboxes.Length;
         if (projectile != null) InitializeProjectiles();
-        timeLeft = attackTime;
+        timeLeft = cooldown;
     }
 
     public void ActivateHitBox()
@@ -70,7 +72,7 @@ public class AttackHitboxes : MonoBehaviour
             if (timeLeft <= 0)
             {
                 canAttack = true;
-                timeLeft = attackTime;
+                timeLeft = cooldown;
             }
         }
         else if (inRange)
@@ -161,12 +163,14 @@ public class AttackHitboxes : MonoBehaviour
     {
         Transform kts = GameObject.FindGameObjectWithTag("ProjectileHolder").transform;
         projectiles = new (GameObject, Projectile)[cap];
+        ObjectManager man = ObjectManager.Ins;
         for (int i = 0; i < cap; i++)
         {
             GameObject newProj = Instantiate(projectile, kts);
             Projectile newProjInfo = newProj.GetComponent<Projectile>();
             projectiles[i] = (newProj, newProjInfo);
             newProj.SetActive(false);
+            man.AddObject(newProj, newProjInfo.projTypeName, "Projectile");
         }
     }
     public void ShootLogic()

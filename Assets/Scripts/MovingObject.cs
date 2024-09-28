@@ -11,7 +11,7 @@ public class MovingObject : RaycastController
     BoxCollider2D col;
     public Vector3[] waypoints, globalWP;
     public float speed;
-    public enum ObjectType { PLATFORM, ENEMY, ITEM}
+    public enum ObjectType { PLATFORM, ENEMY, OBJECT}
     public ObjectType type;
     [SerializeField]
     int fromWPi; [SerializeField] float perWP;
@@ -42,9 +42,36 @@ public class MovingObject : RaycastController
         {
             case ObjectType.PLATFORM: wpcolor = Color.green; SetWaypoints(); break;
             case ObjectType.ENEMY: wpcolor = Color.red; SetEnemyWayPoints(); break;
-            case ObjectType.ITEM: wpcolor = Color.yellow; break;
+            case ObjectType.OBJECT: wpcolor = Color.yellow; SetObjectWaypoints(); break;
         }
         sprite.enabled = true;
+    }
+    void SetObjectWaypoints()
+    {
+        int ran = UnityEngine.Random.Range(0, 2);
+        Vector2 dir = ran == 0 ? Vector2.left : Vector2.up;
+        Vector2 point = transform.position;
+        RaycastHit2D hit1 = Physics2D.Raycast(point, dir, 100f, waypointMask);
+        RaycastHit2D hit2 = Physics2D.Raycast(point, -dir, 100f, waypointMask);
+
+
+
+        float hitPointX1 = dir.x == 0 ? hit1.point.x : hit1.point.x - dir.x;
+        float hitPointY1 = dir.y == 0 ? hit1.point.y : hit1.point.y - dir.y;
+        float hitPointX2 = dir.x == 0 ? hit2.point.x : hit2.point.x + dir.x;
+        float hitPointY2 = dir.y == 0 ? hit2.point.y : hit2.point.y + dir.y;
+
+
+        waypoints = new Vector3[3];
+        waypoints[0] = point;
+        waypoints[1] = new Vector2(hitPointX1, hitPointY1);
+        waypoints[2] = new Vector2(hitPointX2, hitPointY2);
+
+        globalWP = new Vector3[waypoints.Length];
+        for (int i = 0; i < waypoints.Length; i++)
+        {
+            globalWP[i] = global ? waypoints[i] : waypoints[i] + transform.position;
+        }
     }
     void SetWaypoints()
     {
@@ -59,7 +86,8 @@ public class MovingObject : RaycastController
         if (!walker) enemy = GetComponent<Enemy>();
         string walkr = walker ? "a walker" : "not a walker";
 
-        Vector2 dir = Vector2.left, point = transform.position;
+        Vector2 dir = Vector2.left;
+        Vector2 point = transform.position;
         if (!walker) { dir = new Vector2(enemy.shootDir.y, enemy.shootDir.x); }
         else
         {

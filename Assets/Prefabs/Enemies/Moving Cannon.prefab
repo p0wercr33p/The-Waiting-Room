@@ -262,6 +262,7 @@ MonoBehaviour:
   canAttack: 0
   attacking: 0
   firePoint: {fileID: 2925490400024139943}
+  typeName: MCN
 --- !u!61 &49923997544847294
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -360,7 +361,7 @@ MonoBehaviour:
     m_Bits: 0
   waypointMask:
     serializedVersion: 2
-    m_Bits: 72
+    m_Bits: 328
   waypoints: []
   globalWP: []
   speed: 8

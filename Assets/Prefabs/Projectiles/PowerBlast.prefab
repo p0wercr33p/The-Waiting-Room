@@ -174,19 +174,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 25
   life: 5
-  lifeLeft: 5
+  distance: 0
   dmg: 2
   dmgVsEnemies: 2
   effect: 0
-  rotate: 0
   rb: {fileID: 2645475572686832172}
   team: 0
   aiPath: {fileID: 0}
-  scale: {x: 0, y: 0}
-  explosionScale: {x: 0, y: 0}
-  defaultHitboxSize: {x: 0.29, y: 0.19}
-  explosionHitboxSize: {x: 0.29, y: 0.19}
+  explosionPrefab: {fileID: 0}
   heetSeeking: 0
+  trigger: 0
+  projTypeName: PB
 --- !u!95 &-4831245962511903361
 Animator:
   serializedVersion: 5

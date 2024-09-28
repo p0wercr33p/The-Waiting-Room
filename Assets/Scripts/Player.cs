@@ -33,6 +33,7 @@ public class Player : MonoBehaviour
     {
         if (Ins == null)
             Ins = this;
+        
         ani = GetComponent<Animator>();
     }
     void Start()

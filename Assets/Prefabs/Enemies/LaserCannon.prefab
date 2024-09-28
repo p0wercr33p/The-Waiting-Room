@@ -124,6 +124,7 @@ MonoBehaviour:
   canAttack: 0
   attacking: 0
   firePoint: {fileID: 1766795341422620044}
+  typeName: LC
 --- !u!61 &4943020479536785918
 BoxCollider2D:
   m_ObjectHideFlags: 0

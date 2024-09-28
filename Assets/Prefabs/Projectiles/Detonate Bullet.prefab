@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 4457417560786684490}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 53.52, y: 7.4, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 9, y: 9, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -205,3 +205,4 @@ MonoBehaviour:
   explosionPrefab: {fileID: 1967885051068647546, guid: 64625afbbe9669146bc84bc1511f799a, type: 3}
   heetSeeking: 0
   trigger: 1
+  projTypeName: DET

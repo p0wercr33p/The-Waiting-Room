@@ -174,19 +174,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 7
   life: 8
-  lifeLeft: 8
+  distance: 0
   dmg: 2
   dmgVsEnemies: 0
   effect: 0
-  rotate: 0
   rb: {fileID: 3499633380506550765}
   team: 1
   aiPath: {fileID: 0}
-  scale: {x: 0, y: 0}
-  explosionScale: {x: 0, y: 0}
-  defaultHitboxSize: {x: 0.89, y: 0.835}
-  explosionHitboxSize: {x: 0.89, y: 0.835}
+  explosionPrefab: {fileID: 0}
   heetSeeking: 0
+  trigger: 0
+  projTypeName: CBALL
 --- !u!95 &3470000319814187875
 Animator:
   serializedVersion: 5

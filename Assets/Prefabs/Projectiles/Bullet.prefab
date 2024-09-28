@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 8791549566423477395}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 17.67, y: 7.29, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 11, y: 11, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -195,16 +195,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 15
   life: 5
-  lifeLeft: 5
+  distance: 0
   dmg: 1
   dmgVsEnemies: 0
   effect: 0
-  rotate: 0
   rb: {fileID: 815692343250016647}
   team: 1
   aiPath: {fileID: 0}
-  scale: {x: 0, y: 0}
-  explosionScale: {x: 0, y: 0}
-  defaultHitboxSize: {x: 0.14, y: 0.08}
-  explosionHitboxSize: {x: 0.14, y: 0.08}
+  explosionPrefab: {fileID: 0}
   heetSeeking: 0
+  trigger: 0
+  projTypeName: BUL

@@ -70,6 +70,7 @@ public class Enemy : MonoBehaviour
     }
     void InitializeProjectiles(){
         Transform kts = GameObject.FindGameObjectWithTag("ProjectileHolder").transform;
+        ObjectManager man = ObjectManager.Ins;
         if (type != EnemyType.MELEE && type != EnemyType.DUMMY && bullet == BulletType.PROJECTILE)
         {
             print("initializing");
@@ -80,6 +81,7 @@ public class Enemy : MonoBehaviour
                 Projectile newProjInfo = newProj.GetComponent<Projectile>();
                 projectiles[i] = (newProj, newProjInfo);
                 newProj.SetActive(false);
+                man.AddObject(newProj, newProjInfo.projTypeName, "Projectile");
             }
         }
     }

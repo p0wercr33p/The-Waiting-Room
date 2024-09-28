@@ -16,7 +16,7 @@ public class ObjectBank : MonoBehaviour
     [Header("Items")]
     public GameObject pBlaster;
     public GameObject sBlaster;
-    public GameObject heart, troll;
+    public GameObject heart;
 
     [Header("Enemies")]
     public GameObject groundDroid;
@@ -31,67 +31,45 @@ public class ObjectBank : MonoBehaviour
     public int maxBlasts;
     Dictionary<string, int> hazardCounts;
     Dictionary<string, int> maxHazardCounts;
-  
+    public string[] enemyNames;
 
-    public Dictionary<GameObject, bool> nul;
-    public Dictionary<GameObject, Projectile> droidBullet;
     public GameObject[] lvlHazards;
     public GameObject[] lvlItems;
     public GameObject[] lvlEnemies;
     string[] hazardTypes;
-    GameObject me;
-    GameObject[] allHazards, allItems, allObjs;
-    GameObject[] availableHazards;
 
 
     void Awake()
     {
         InitializeHazardCounts();
         AddObjectsInfo();
-        Trollololo();
     }
 
-    void Trollololo()
-    {
-        allHazards = new GameObject[] { fireSaws, saws, iceSaws, bombs, freezeBlast, heavensFury };
-        allItems = new GameObject[] { sBlaster, heart, pBlaster };
-        int ran = Random.Range(0, 11);
-        if (ran == 9)
-        {
-            ran = Random.Range(0, allHazards.Length);
-            troll = allHazards[ran];
-        }
-        else
-        {
-            ran = Random.Range(0, allItems.Length);
-            troll = allItems[ran];
-        }
-    }
     private void InitializeHazardCounts()
     {
         hazardCounts = new Dictionary<string, int>()
         {
             {"Saws", 0 },
             {"Bombs", 0 },
-            {"HeavensFury", 0 },
+            {"Fury", 0 },
             {"FreezeBlast", 0 }
         };
         maxHazardCounts = new Dictionary<string, int>
         {
             { "Saws", maxSaws },
             { "Bombs", maxBombs },
-            { "HeavensFury", maxFuries },
+            { "Fury", maxFuries },
             { "FreezeBlast", maxBlasts }
         };
     }
     void AddObjectsInfo()
     {
         lvlEnemies = new GameObject[] { droid, rocketDroid, stormHead, groundDroid};
-        lvlItems = new GameObject[] { sBlaster, heart, pBlaster, troll };
+        lvlItems = new GameObject[] { sBlaster, heart, pBlaster};
         lvlHazards = new GameObject[] { iceSaws, saws, fireSaws, bombs, heavensFury, freezeBlast };
-        hazardTypes = new string[] { "Saws", "Saws", "Saws", "Bombs", "HeavensFury", "FreezeBlast" };
+        hazardTypes = new string[] { "IceSaws", "Saws", "FireSaws", "Bombs", "Fury", "FreezeBlast" };
+        enemyNames = new string[] { "DR", "RD", "SH", "GD" };
     }
-
     public (GameObject,string) MakeHazard()
     {
         int count = lvlHazards.Count();
@@ -100,6 +78,7 @@ public class ObjectBank : MonoBehaviour
         for (int i = stI; i < count; i++)
         {
             string hazardType = hazardTypes[i];
+            if (i == 0 || i == 2) hazardType = "Saws";
             if (hazardCounts[hazardType] < maxHazardCounts[hazardType])
             {
                 hazardCounts[hazardType]++;
@@ -109,6 +88,7 @@ public class ObjectBank : MonoBehaviour
         for (int i = stI-1; i >= 0; i--)
         {
             string hazardType = hazardTypes[i];
+            if (i == 0 || i == 2) hazardType = "Saws";
             if (hazardCounts[hazardType] < maxHazardCounts[hazardType])
             {
                 hazardCounts[hazardType]++;

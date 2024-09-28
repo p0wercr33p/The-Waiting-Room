@@ -5,7 +5,7 @@ using UnityEngine;
 public class PauseEvent : MonoBehaviour
 {
     public static PauseEvent Ins;
-    public static bool Paused;
+    public bool Paused;
 
     void Awake() => Ins = this;
     void Start()

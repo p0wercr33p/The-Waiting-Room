@@ -208,7 +208,7 @@ MonoBehaviour:
   triggerByKeyPress: 0
   enemyTeam: 0
   lifeLeft: 999
-  lifeTimer: 999
+  lifeTimer: 20
   triggerObjs:
   - {fileID: 845233515760111374, guid: 6def972bfe9cbfb42ae2edf3dec5041f, type: 3}
 --- !u!95 &5919970347844649899

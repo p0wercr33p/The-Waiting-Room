@@ -25,12 +25,14 @@ public class PlayerInput : MonoBehaviour
     public Dictionary<string, ProjDict> projs;
     public Dictionary<string, int> usages;
     public static PlayerInput Ins;
+    ObjectManager Jim;
     public string cur;
     private void Awake() => Ins = this;
     void Start()
     {
         projNames = new string[] { "SuperBlast", "PowerBlast" };
         ind = 0;
+        Jim = ObjectManager.Ins;
         projs = new();
         usages = new();
         attacking = false;
@@ -55,6 +57,7 @@ public class PlayerInput : MonoBehaviour
             pr.SetActive(false); 
             superBlast.pr[i] = pr;
             superBlast.info[i] = info;
+            Jim.AddObject(pr, "SB", "Projectile");
         }
         projs["SuperBlast"] = superBlast;
 
@@ -67,6 +70,7 @@ public class PlayerInput : MonoBehaviour
             pr.SetActive(false);
             powerBlast.pr[i] = pr;
             powerBlast.info[i] = info;
+            Jim.AddObject(pr, "PB", "Projectile");
         }
         projs["PowerBlast"] = powerBlast;
     }
@@ -93,6 +97,7 @@ public class PlayerInput : MonoBehaviour
             ani.SetTrigger(cur);
         }
         if (Input.GetKeyDown(KeyCode.Alpha6)) usages[cur] += 3;
+        if (Input.GetKeyDown(KeyCode.P)) player.ChangeGravity(0);
         HandleAnimations();
         if (Input.GetKeyDown(KeyCode.Space)) { player.OnJumpInputDown(); }
         if (Input.GetKeyUp(KeyCode.Space)) { player.OnJumpInputUp(); }
@@ -145,7 +150,6 @@ public class PlayerInput : MonoBehaviour
     }
     void HandleAnimations()
     {
-        if (PauseEvent.Paused) return;
         grounded = player.flipped ? player.contr.cols.above : player.contr.cols.below;
         
         ani.SetInteger("MoveDirX", (int)input.x);

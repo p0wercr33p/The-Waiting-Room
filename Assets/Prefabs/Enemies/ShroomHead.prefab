@@ -34,7 +34,7 @@ Transform:
   m_GameObject: {fileID: 291113751578691114}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 56.24, y: -3.3319998, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 15, y: 15, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -155,7 +155,7 @@ BoxCollider2D:
   m_Offset: {x: -0.06, y: 0.21}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.45, y: 0}
+    pivot: {x: 0.5, y: 0}
     oldSize: {x: 1.19, y: 1.24}
     newSize: {x: 1.19, y: 1.24}
     adaptiveTilingThreshold: 0.5
@@ -197,7 +197,7 @@ MonoBehaviour:
     m_Bits: 0
   waypointMask:
     serializedVersion: 2
-    m_Bits: 328
+    m_Bits: 1352
   waypoints: []
   globalWP: []
   speed: 8
@@ -282,7 +282,7 @@ PolygonCollider2D:
   m_Offset: {x: 0, y: 0.63}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.45, y: 0}
+    pivot: {x: 0.5, y: 0}
     oldSize: {x: 1.19, y: 1.24}
     newSize: {x: 1.19, y: 1.24}
     adaptiveTilingThreshold: 0.5
@@ -348,7 +348,7 @@ PolygonCollider2D:
   m_Offset: {x: 0, y: 0.63}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.45, y: 0}
+    pivot: {x: 0.5, y: 0}
     oldSize: {x: 1.19, y: 1.24}
     newSize: {x: 1.19, y: 1.24}
     adaptiveTilingThreshold: 0.5

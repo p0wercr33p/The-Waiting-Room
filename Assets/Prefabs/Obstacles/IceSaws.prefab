@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 5936907360699782796}
   - component: {fileID: 5169176534136666539}
   - component: {fileID: 7573138400406050585}
-  - component: {fileID: 2078476726401107139}
   - component: {fileID: 2827599016676313074}
   - component: {fileID: 5865350602988115903}
+  - component: {fileID: 5996246333394853754}
+  - component: {fileID: 5679596036914072420}
   m_Layer: 0
   m_Name: IceSaws
   m_TagString: Damaging
@@ -109,41 +110,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!58 &2078476726401107139
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4788434151004218045}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: -0.009237908, y: 0.0088288905}
-  serializedVersion: 2
-  m_Radius: 0.342548
 --- !u!50 &2827599016676313074
 Rigidbody2D:
   serializedVersion: 4
@@ -191,9 +157,98 @@ MonoBehaviour:
   dmg: 1
   healAmount: 0
   index: 0
-  hasTimer: 0
   hasWayPoins: 0
   triggerByKeyPress: 0
+  enemyTeam: 0
   lifeLeft: 0
   lifeTimer: 0
   triggerObjs: []
+--- !u!114 &5996246333394853754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4788434151004218045}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b807db5ce2d8ff4786a8289be2a9a50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dstBeRays: 0.25
+  hRays: 0
+  vRays: 0
+  hRaySpacing: 0
+  vRaySpacing: 0
+  skinWidth: 0.015
+  rcOg:
+    topL: {x: 0, y: 0}
+    topR: {x: 0, y: 0}
+    botL: {x: 0, y: 0}
+    botR: {x: 0, y: 0}
+  boxCol: {fileID: 0}
+  mask:
+    serializedVersion: 2
+    m_Bits: 0
+  pMask:
+    serializedVersion: 2
+    m_Bits: 0
+  waypointMask:
+    serializedVersion: 2
+    m_Bits: 264
+  waypoints: []
+  globalWP: []
+  speed: 6
+  type: 2
+  fromWPi: 0
+  perWP: 0
+  cyclic: 1
+  walker: 0
+  wpcolor: {r: 0, g: 0, b: 0, a: 1}
+  sprite: {fileID: 0}
+  global: 1
+--- !u!61 &5679596036914072420
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4788434151004218045}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.64, y: 0.64}
+    newSize: {x: 4.81, y: 4.81}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.55, y: 0.55}
+  m_EdgeRadius: 0

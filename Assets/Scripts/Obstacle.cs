@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 public class Obstacle : MonoBehaviour
 {
     public enum ObstacleClass { DANGER, TRIGGER, INTERACTABLE, HEALING, EFFECT };
-    public enum ObstacleType { SPIKES, SAWS, FIRE, EXPLOSION, FURY, BOMB, NONE };
+    public enum ObstacleType { SAWS, EXPLOSION, FURY, BOMB, NONE };
     public enum Effect { ICE, FIRE, ElECTRIC, NONE };
     public Effect property;
     public ObstacleType type;
@@ -20,7 +20,7 @@ public class Obstacle : MonoBehaviour
     [SerializeField] bool inRange;
     public int effect = 0, dmg, healAmount, index;
     bool active = false, startTimer, healed;
-    public bool hasWayPoins, triggerByKeyPress, enemyTeam;
+    public bool hasWayPoints, triggerByKeyPress, enemyTeam;
     public float lifeLeft, lifeTimer;
 
     Throwable throwable;
@@ -42,8 +42,7 @@ public class Obstacle : MonoBehaviour
         player = Player.Ins;
         manager = Manager.Ins;
         if (classType != ObstacleClass.DANGER || type == ObstacleType.NONE) dmg = 0;
-        else if (type == ObstacleType.SPIKES || type == ObstacleType.SAWS) dmg = 1;
-        else if (type == ObstacleType.FIRE) dmg = 2;
+        else if (type == ObstacleType.SAWS) dmg = 1;
         else if (type == ObstacleType.EXPLOSION) dmg = 4;
         else if (type == ObstacleType.FURY){
             dmg = 4;
@@ -94,6 +93,17 @@ public class Obstacle : MonoBehaviour
             gameObject.SetActive(false); 
         }
     }
+    void Disinegrate()
+    {
+        startTimer = false;
+        if (index >= 0) manager.Swap(index);
+        if (type == ObstacleType.BOMB)
+        {
+            throwable.col.enabled = true; throwable.beingCarried = throwable.inRange = false;
+            transform.parent = manager.transform;
+        } 
+        gameObject.SetActive(false);
+    }
     public void ActivateHitBox()
     {
         active = !active;
@@ -137,7 +147,6 @@ public class Obstacle : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D coll)
     {
         bool isPlayer = coll.CompareTag("Player");
-       
         if (isPlayer)
         {
             if (classType == ObstacleClass.DANGER){

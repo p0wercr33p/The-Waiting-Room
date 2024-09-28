@@ -125,6 +125,7 @@ MonoBehaviour:
   canAttack: 0
   attacking: 0
   firePoint: {fileID: 8566766489131400923}
+  typeName: MLC
 --- !u!61 &8981205335298139539
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -306,7 +307,7 @@ MonoBehaviour:
     m_Bits: 0
   waypointMask:
     serializedVersion: 2
-    m_Bits: 72
+    m_Bits: 328
   waypoints:
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 0}
