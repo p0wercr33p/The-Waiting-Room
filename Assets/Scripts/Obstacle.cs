@@ -8,9 +8,7 @@ using UnityEngine.UIElements;
 public class Obstacle : MonoBehaviour
 {
     public enum ObstacleClass { DANGER, TRIGGER, INTERACTABLE, HEALING, EFFECT };
-    public enum ObstacleType { SAWS, EXPLOSION, FURY, BOMB, NONE };
-    public enum Effect { ICE, FIRE, ElECTRIC, NONE };
-    public Effect property;
+    public enum ObstacleType { SAWS, EXPLOSION, FURY, BOMB,FIRE, NONE };
     public ObstacleType type;
     public ObstacleClass classType;
     Dictionary<Transform, Throwable> itemBook;
@@ -41,10 +39,7 @@ public class Obstacle : MonoBehaviour
     {
         player = Player.Ins;
         manager = Manager.Ins;
-        if (classType != ObstacleClass.DANGER || type == ObstacleType.NONE) dmg = 0;
-        else if (type == ObstacleType.SAWS) dmg = 1;
-        else if (type == ObstacleType.EXPLOSION) dmg = 4;
-        else if (type == ObstacleType.FURY){
+        if (type == ObstacleType.FURY){
             dmg = 4;
             int ran = UnityEngine.Random.Range(0,10);
             if (ran > 4){
@@ -53,13 +48,6 @@ public class Obstacle : MonoBehaviour
             } else{
                 transform.position = new Vector2(transform.position.x, -9);
             }
-        }
-        switch (property)
-        {
-            case Effect.ICE: effect = 1; break;
-            case Effect.FIRE: effect = 2; break;
-            case Effect.ElECTRIC: effect = 3; break;
-            case Effect.NONE: effect = 0; break;
         }
         if (type == ObstacleType.BOMB) { explosion = Instantiate(triggerObjs[0]); explosion.SetActive(false); throwable = GetComponent<Throwable>(); }
         lifeLeft = lifeTimer;
@@ -163,7 +151,7 @@ public class Obstacle : MonoBehaviour
                 else inRange = true;
             }
         }
-        if (type == ObstacleType.EXPLOSION)
+        if (type == ObstacleType.EXPLOSION || type == ObstacleType.FURY || type == ObstacleType.FIRE)
         {
             if (coll.CompareTag("Item"))
             {

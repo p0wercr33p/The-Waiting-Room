@@ -7,7 +7,7 @@ using static Unity.Burst.Intrinsics.X86.Avx;
 public class Throwable : RaycastController
 {
     Player player; 
-    public Vector2 throwForce, grabHitBox;
+    public Vector2 throwForce, grabHitBox, offset;
     public bool isFloating, beingCarried, inRange;
     public Vector2 velocity;
     Manager manager;
@@ -41,7 +41,7 @@ public class Throwable : RaycastController
         contr = Controller.Ins;
         playerCol = player.GetComponent<BoxCollider2D>();
         Id = gameObject.GetInstanceID();
-        grabBox = new GrabBox(col.bounds, grabHitBox, player, Id);
+        grabBox = new GrabBox(col.bounds, grabHitBox, player, Id, offset);
         if (type == ItemType.BOMB) bomb = GetComponent<Obstacle>();
     }
 
@@ -181,12 +181,13 @@ public class Throwable : RaycastController
     [System.Serializable]
     struct GrabBox
     {
-        public Vector2 center;
+        public Vector2 center, offset;
         public float right, left, top, bottom;
         Player pl; int id;
-        public GrabBox(Bounds targetBounds, Vector2 size, Player _pl, int _id)
+        public GrabBox(Bounds targetBounds, Vector2 size, Player _pl, int _id, Vector2 _offset)
         {
-            center = targetBounds.center; pl = _pl; id = _id;
+            offset = _offset;
+            center = (Vector2)targetBounds.center + _offset; pl = _pl; id = _id;
 
             // Calculate edges based on the center
             left = center.x - size.x / 2;
@@ -196,12 +197,13 @@ public class Throwable : RaycastController
         }
         public void Move(Vector2 newCenter)
         {
-            Vector2 offset = newCenter - center;
+            newCenter += offset;
+            Vector2 newOffset = newCenter - center;
             center = newCenter;
-            left += offset.x;
-            right += offset.x;
-            top += offset.y;
-            bottom += offset.y;
+            left += newOffset.x;
+            right += newOffset.x;
+            top += newOffset.y;
+            bottom += newOffset.y;
         }
         public bool IsPlayerInside(BoxCollider2D playerColl) 
         {
@@ -229,6 +231,6 @@ public class Throwable : RaycastController
     {
         Gizmos.color = grabBoxColor;
 
-        if (draw) Gizmos.DrawCube(grabBox.center, grabHitBox);
+        if (draw) Gizmos.DrawCube(grabBox.center + offset, grabHitBox);
     }
 }

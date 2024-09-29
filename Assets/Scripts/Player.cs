@@ -11,18 +11,18 @@ using static Unity.Burst.Intrinsics.X86;
 public class Player : MonoBehaviour
 {
     Animator ani;
-    float vXSmoothing, wallStickTime;
+    float vXSmoothing, wallStickTime = 0;
     [HideInInspector] private float accel = .2f, wallSp, airAccel = .1f; 
     [HideInInspector] private float[] jumpData = new float[] { 4, .5f, 2, .25f, 9, 1.2f };
     public float maxJPower, minJPower, maxJHeight = 4f, jumpApexTime = .5f, minJHeight;
     [HideInInspector] public Controller contr;
     [HideInInspector] public bool flipped, wallClimbing, crouching;
 
-    [SerializeField] private float gravity, speed, fireTimer, iceTimer, invincibleTimer, shockTimer, shockTimeLeft;
+    [SerializeField] private float gravity, speed, fireTimer, iceTimer, invincibleTimer, shockTimer, shockTimeLeft,acidicTimer;
     [SerializeField] private Vector3 velocity;
-    private float wDirX, tarVX, wallStickTimeLeft, iceTimeLeft, fireTimeLeft, invincTimeLeft = 2;
-    public int carryId, hp, maxHp; 
-    private bool hasStatusEffectOn, invincible, onFire, iced;
+    private float wDirX, tarVX, wallStickTimeLeft, iceTimeLeft, fireTimeLeft, invincTimeLeft = 2,acidicTimeLeft;
+    public int carryId, hp, maxHp, acidStacks; 
+    private bool hasStatusEffectOn, invincible, onFire, iced, acidic;
     SpriteRenderer sprite;
     public Color[] colorStates;
     public bool shocked, carryingItem;
@@ -103,7 +103,7 @@ public class Player : MonoBehaviour
             else if (iceTimeLeft <= 0)
             {
                 iced = false; iceTimeLeft = iceTimer; speed = 15;
-                sprite.color = colorStates[4]; hasStatusEffectOn = false;
+                sprite.color = colorStates[3]; hasStatusEffectOn = false;
             }
         }
         
@@ -128,7 +128,16 @@ public class Player : MonoBehaviour
                 sprite.color = colorStates[3]; hasStatusEffectOn = false;
             }
         }
-       
+        if (acidic)
+        {
+            if (!invincible && acidicTimeLeft > 0)
+            { acidicTimeLeft -= Time.deltaTime; sprite.color = colorStates[7]; }
+            else if (acidicTimeLeft <= 0)
+            {
+                acidic = false; acidicTimeLeft = acidicTimer; acidStacks = 0;
+                sprite.color = colorStates[3]; hasStatusEffectOn = false;
+            }
+        }
 
     }
     public void HandleWallSliding()
@@ -178,22 +187,22 @@ public class Player : MonoBehaviour
     }
     public void TakeDamage(int dmg, int effect = 0)
     {
-        if (invincible) { return; }
+        if (invincible) { print("hes.... invinci"); return; }
         invincible = true;
         ani.SetTrigger("Hurt");
         dmg = shocked ? (int)(dmg * 1.5f) : dmg;
-        hp = hp - dmg;
-        print($"owch, {hp + dmg} - {dmg} = {hp} health left");
+        hp = hp - (dmg + acidStacks);
         velocity.y = dmgBounce.y;
         velocity.x = dmgBounce.x * -contr.dirX;
-        if (effect > 0 && !hasStatusEffectOn) StartCoroutine(Effects(effect));
+        if (effect > 0) ApplyEffect(effect);
         StartCoroutine(DamagedColors());
 
         if (hp <= 0) { print($"dead hp = {hp}"); ani.SetTrigger("Die"); }
     }
     public void ApplyEffect(int effect = 0)
     {
-        if (effect > 0 && !hasStatusEffectOn) StartCoroutine(Effects(effect));
+        bool canContinue = (!hasStatusEffectOn || (acidic && effect == 4));
+        if (effect > 0 && canContinue) StartCoroutine(Effects(effect));
     }
     IEnumerator Effects(int effect)
     {
@@ -211,6 +220,8 @@ public class Player : MonoBehaviour
                 }
                 break;
             case 3: shocked = true; shockTimeLeft = shockTimer; break;
+            case 4: acidic = true; acidicTimeLeft = acidicTimer; 
+                acidStacks = Math.Min(acidStacks + 1, 3); break;
         }
     }
     IEnumerator DamagedColors()

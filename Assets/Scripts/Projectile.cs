@@ -12,7 +12,7 @@ public class Projectile : MonoBehaviour
     float lifeLeft;
     public Rigidbody2D rb; 
     Player player; Transform plT;
-    string playerTag, enemyTag, obstacleTag, groundTag, itemTag;
+    string playerTag, enemyTag, obstacleTag, groundTag;
     public enum Team { PLAYER, ENEMY, NEITHER };
     public Team team; 
     bool active;
@@ -42,7 +42,6 @@ public class Projectile : MonoBehaviour
         playerTag = "Player";
         obstacleTag = "Obstacle";
         groundTag = "Ground";
-        itemTag = "Item";
         
         active = true;
         if (heetSeeking) Invoke("SetTeamToNeither", 0.3f);

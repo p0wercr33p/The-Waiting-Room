@@ -14,13 +14,11 @@ public class Enemy : MonoBehaviour
     (GameObject pr, Projectile info)[] projectiles;
     public LayerMask laserMask;
     public GameObject projectile;
-    public Color[] dummyRainbow;
     public SpriteRenderer spR;
     public LineRenderer laserLine;
 
 
     float maxLaserDist = 80f, laserTimeLeft;
-    int colorInd = 0;
     public int cap, contactDmg;
     public float timeLeft, cooldown;
     public float laserTime;

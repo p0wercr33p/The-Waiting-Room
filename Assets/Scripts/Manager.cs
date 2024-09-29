@@ -63,8 +63,12 @@ public class Manager : MonoBehaviour
             GameObject h = Instantiate(make, this.transform);
             h.transform.position = hazardPoints[i];
             hazards[i] = h;
-            obsDict[h] = h.GetComponent<Obstacle>();
-            obsDict[h].index = i;
+            Obstacle obs = h.GetComponent<Obstacle>();
+            if (obs != null)
+            {
+                obsDict[h] = h.GetComponent<Obstacle>();
+                obsDict[h].index = i;
+            }  
             Jim.AddObject(h, type, "Hazard");
             h.SetActive(false);
         }

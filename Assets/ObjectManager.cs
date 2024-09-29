@@ -17,9 +17,11 @@ public class ObjectManager : MonoBehaviour
     public _Bombs Bombs;
     public _Explosions Explosions;
     public _Saws Saws;
+    public _Flames Fire;
     public _Cannons Cannons;
     public Projectiles Projs;
     public HeavensFuries Furies;
+    public _Toxic Toxic;
     private void Awake() {
         Ins = this;
         Droids = new DROIDS(1);
@@ -29,11 +31,14 @@ public class ObjectManager : MonoBehaviour
         Cannons = new _Cannons(1);
         Projs = new Projectiles(1);
         Furies = new HeavensFuries(1);
+        Toxic = new _Toxic(1);
+        Fire = new _Flames(1);
         ind = 0;
         mods = new string[] { 
             "Bigger Bombs", "Tankier Tanks", "Amber Alert", "Hasty Rockets", "Bigger Gun Diplomacy",
             "Schrodinger's Damager Numbers", "Property Purgatory", "Newton's New Law",
-            "Wrath Of The Gods", "Foot Soldier", "Slower Than A Speeding Bullet"
+            "Wrath Of The Gods", "Foot Soldier", "Slower Than A Speeding Bullet", 
+            "Give Me Liberty Give Me Fire", "Make Love Not Waste"
         };
         curMod = mods[ind];
     }
@@ -67,6 +72,8 @@ public class ObjectManager : MonoBehaviour
             case "Wrath Of The Gods": WrathOfTheGods(Plus); break;
             case "Foot Soldier": FootSoldier(Plus); break;
             case "Slower Than A Speeding Bullet": SlowerThanASpeedingBullet(Plus); break;
+            case "Give Me Liberty Give Me Fire": GiveMeLibertyGiveMeFire(Plus); break;
+            case "Make Love Not Waste": MakeLoveNotWaste(Plus); break;
         }
     }
     public void BiggerGunDiplomacy(bool plus = false)
@@ -81,8 +88,8 @@ public class ObjectManager : MonoBehaviour
         Cannons.mlc.curScale = Cannons.mlc.scale * scaleInc;
         Cannons.cn.curScale = Cannons.cn.scale * scaleInc;
         Cannons.mcn.curScale = Cannons.mcn.scale * scaleInc;
-        Projs.bul.curDmg += dmg;
-        Projs.bul.SetNewStats();
+        Projs.cBall.curDmg += dmg;
+        Projs.cBall.SetNewStats();
         Cannons.SetNewStatsAll();
     }
     public void BiggerBombs(bool plus = false)
@@ -95,6 +102,16 @@ public class ObjectManager : MonoBehaviour
         Explosions.curDmg += Explosions.dmg + (plus ? 2 : 1);
         Explosions.SetNewStats();
     }
+    public void GiveMeLibertyGiveMeFire(bool plus = false)
+    {
+        // All fire is 100% bigger and deals 2 extra damage
+        // Plus+ -- fire gets 120% bigger and fire spreads cause 2 extra flames
+        Fire.curScale *= plus ? 2.2f : 2f;
+        Fire.curDmg += 2;
+        Projs.fb.thirdSpread = plus;
+        Fire.SetNewStats();
+        Projs.fb.SetNewStats();
+    }
     public void TankierTanks(bool plus = false)
     {
         // All enemies have an extra 3 hp.
@@ -103,7 +120,8 @@ public class ObjectManager : MonoBehaviour
         Droids.sh.curHp += plus ? 5 : 3;
         Droids.gd.curHp += plus ? 5 : 3;
         Droids.dr.curHp += plus ? 5 : 3;
-        Droids.SetNewStatsAll(new HashSet<string>() { "SH","DR","GR","RD"});
+        Droids.fd.curHp += plus ? 5 : 3;
+        Droids.SetNewStatsAll(new HashSet<string>() { "SH","DR","GR","RD", "FD"});
     }
     public void HastyRockets(bool plus = false)
     {
@@ -148,6 +166,20 @@ public class ObjectManager : MonoBehaviour
         Projs.cBall.curSpeed = Projs.cBall.speed * (plus ? 2 : 1.5f);
         Projs.SetNewStatsAll(new HashSet<string> { "CBALL", "BUL"});
     }
+    public void MakeLoveNotWaste(bool plus = false)
+    {
+        // Toxic waste barrels create a toxic gas cloud that applies acidic stacks.
+        // It gradually grows bigger over time if not destroyed
+        // Plus+ -- base size of Toxic barrel and gas cloud is increased by 25%
+        // ^^^^+ -- Gas Cloud grows in size 30% faster 
+        Toxic.spread = true;
+        if (plus)
+        {
+            Toxic.curScale *= 1.25f;
+            Toxic.curGrowthSpeed *= .7f;
+        }
+        Toxic.SetNewStats();
+    }
     public void NewtonsNewLaw()
     {
         // Elemental Hazards now move
@@ -160,13 +192,14 @@ public class ObjectManager : MonoBehaviour
         //potentially from none to having one, and vice-versa.
         // Plus+ -- Projectiles cannont randomize to having no property: Orange
         int min = plus ? 1 : 0;
-        Projs.bul.curEffect = UnityEngine.Random.Range(min, 4);
-        Projs.rk.curEffect = UnityEngine.Random.Range(min, 4);
-        Projs.cBall.curEffect = UnityEngine.Random.Range(min, 4);
-        Projs.pb.curEffect = UnityEngine.Random.Range(min, 4);
-        Projs.sb.curEffect = UnityEngine.Random.Range(min, 4);
+        Projs.bul.curEffect = UnityEngine.Random.Range(min, 5);
+        Projs.rk.curEffect = UnityEngine.Random.Range(min, 5);
+        Projs.cBall.curEffect = UnityEngine.Random.Range(min, 5);
+        Projs.pb.curEffect = UnityEngine.Random.Range(min, 5);
+        Projs.sb.curEffect = UnityEngine.Random.Range(min, 5);
+        Projs.fb.curEffect = UnityEngine.Random.Range(min, 5);
 
-        Projs.SetNewStatsAll(new HashSet<string> { "CBALL", "BUL","RK","PB","SB" });
+        Projs.SetNewStatsAll(new HashSet<string> { "CBALL", "BUL","RK","PB","SB", "FB" });
     }
     public void SchrodingersDamagerNumbers(bool plus = false)
     {
@@ -178,7 +211,8 @@ public class ObjectManager : MonoBehaviour
         Projs.cBall.curDmg = UnityEngine.Random.Range(minRange, max);
         Projs.pb.curDmg = UnityEngine.Random.Range(minRange, max);
         Projs.sb.curDmg = UnityEngine.Random.Range(minRange, max);
-        Projs.SetNewStatsAll(new HashSet<string> { "CBALL", "BUL", "RK","PB","SB" });
+        Projs.fb.curDmg = UnityEngine.Random.Range(minRange, max);
+        Projs.SetNewStatsAll(new HashSet<string> { "CBALL", "BUL", "RK","PB","SB", "FB" });
         Explosions.curDmg = UnityEngine.Random.Range(minRange, max);
         Explosions.SetNewStats();
         Furies.curDmg = UnityEngine.Random.Range(minRange, max);
@@ -202,6 +236,12 @@ public class ObjectManager : MonoBehaviour
                 MovingObject wp = add.GetComponent<MovingObject>();
                 switch (type)
                 {
+                    case "ToxicBarrel":
+                        GasSpread gas = add.GetComponentInChildren<GasSpread>();
+                        AttackHitboxes att = add.GetComponentInChildren<AttackHitboxes>();
+                        Toxic.arr.Add((add, gas, att));
+                        Toxic.count.Add(add); break;
+                    case "Fire": Fire.arr.Add((add, o)); Fire.count.Add(add); break;
                     case "Saws":
                         Saws.elec.arr.Add((add, o,wp)); Saws.elec.count.Add(add);
                         break;
@@ -244,6 +284,7 @@ public class ObjectManager : MonoBehaviour
                 HealthData HP = add.GetComponent<HealthData>();
                 switch (type)
                 {
+                    case "FD": Droids.fd.arr.Add((add, ene, ai, HP)); Droids.fd.count.Add(add); break;
                     case "SH":
                         Droids.sh.arr.Add((add, aH, mO2, HP)); Droids.sh.count.Add(add); break;
                     case "GD":
@@ -264,6 +305,7 @@ public class ObjectManager : MonoBehaviour
                     case "BUL": Projs.bul.arr.Add((add, pr)); Projs.bul.count.Add(add);  break;
                     case "PB": Projs.pb.arr.Add((add, pr)); Projs.pb.count.Add(add);  break;
                     case "SB": Projs.sb.arr.Add((add, pr)); Projs.sb.count.Add(add);  break;
+                    case "FB": Projs.fb.arr.Add((add, pr, add.GetComponent<FireSpread>())); Projs.fb.count.Add(add); break;
                     case "CBALL": Projs.cBall.arr.Add((add, pr)); Projs.cBall.count.Add(add);  break;
                 }
                 break;
@@ -271,6 +313,41 @@ public class ObjectManager : MonoBehaviour
         }
     }
 
+    [System.Serializable]
+    public struct _Toxic
+    {
+        public List<(GameObject obj, GasSpread gas, AttackHitboxes en)> arr;
+        public List<GameObject> count;
+        public float cooldown, curCD,growthSpeed, curGrowthSpeed;
+        public int effect, curEffect;
+        public int dmg, curDmg;
+        public Vector2 scale, curScale;
+        public bool spread;
+        public _Toxic(int i)
+        {
+            arr = new(); count = new();
+            spread = false;
+            cooldown = curCD = 4.5f;
+            growthSpeed = curGrowthSpeed = 2.2f;
+            effect = curEffect = 4;
+            dmg = curDmg = 2;
+            scale = curScale = new Vector2(1, 1);
+        }
+        public void SetNewStats()
+        {
+            foreach (var barrel in arr)
+            {
+                barrel.en.cooldown = curCD;
+                barrel.gas.growthTimer = curGrowthSpeed;
+                barrel.en.effect = curEffect;
+                barrel.gas.enabled = spread;
+                barrel.gas.effect = curEffect;
+                barrel.en.dmg = curDmg;
+                barrel.obj.transform.localScale = curScale;
+            }
+        }
+    }
+    
     [System.Serializable]
     public struct _Bombs
     {
@@ -365,6 +442,33 @@ public class ObjectManager : MonoBehaviour
                 arr = new(); count = new();
                 dmg = curDmg = 1;
                 scale = curScale = new Vector2(12, 12);
+            }
+        }
+    }
+    [System.Serializable]
+    public struct _Flames
+    {
+        public List<(GameObject obj, Obstacle obs)> arr;
+        public List<GameObject> count;
+        public int dmg, curDmg;
+        public float lifeTime, curLifeTime;
+        public Vector2 scale, curScale;
+        public _Flames(int i)
+        {
+            arr = new();
+            count = new();
+            dmg = curDmg = 2;
+            lifeTime = curLifeTime = 3f;
+            scale = curScale = new Vector2(6f, 6f);
+        }
+
+        public void SetNewStats()
+        {
+            foreach (var flame in arr)
+            {
+                flame.obs.dmg = curDmg;
+                flame.obs.lifeTimer = curLifeTime;
+                flame.obj.transform.localScale = curScale;
             }
         }
     }
@@ -614,13 +718,14 @@ public class ObjectManager : MonoBehaviour
         public DR dr;
         public GD gd;
         public SH sh;
-
+        public FD fd;
         public DROIDS(int i)
         {
             rd = new RD(1);
             dr = new DR(1);
             gd = new GD(1);
             sh = new SH(1);
+            fd = new FD(1);
         }
         public void SetNewStatsAll(HashSet<string> change)
         {
@@ -633,6 +738,17 @@ public class ObjectManager : MonoBehaviour
                     obj.obj.transform.localScale = rd.curScale;
                 }
                 print("Set new stats for ROCKET DROID");
+            }
+            if (change.Contains("FD"))
+            {
+                foreach (var obj in fd.arr)
+                {
+                    obj.ai.maxSpeed = fd.curSpeed;
+                    obj.HP.maxHp = fd.curHp;
+                    obj.en.cooldown = fd.curCD;
+                    obj.obj.transform.localScale = fd.curScale;
+                }
+                print("Set new stats for FIRE DROID");
             }
             if (change.Contains("DR"))
             {
@@ -667,6 +783,26 @@ public class ObjectManager : MonoBehaviour
                     obj.obj.transform.localScale = gd.curScale;
                 }
                 print("Set new stats for GROUND DROID");
+            }
+        }
+
+        [System.Serializable]
+        public struct FD
+        {
+            public List<(GameObject obj, Enemy en, AIPath ai, HealthData HP)> arr;
+            public List<GameObject> count;
+            public float cooldown, curCD;
+            public float speed, curSpeed;
+            public int hp, curHp;
+            public Vector2 scale, curScale;
+
+            public FD(int i)
+            {
+                scale = curScale = new Vector2(9, 9);
+                hp = curHp = 6;
+                cooldown = curCD = 6.5f;
+                count = new(); arr = new();
+                speed = curSpeed = 2.5f;
             }
         }
         [System.Serializable]
@@ -754,7 +890,7 @@ public class ObjectManager : MonoBehaviour
         public BUL bul;
         public CBALL cBall;
         public RK rk;
-
+        public FB fb;
         public void SetNewStatsAll(HashSet<string> change)
         {
             if (change.Contains("DET")) det.SetNewStats();
@@ -763,6 +899,7 @@ public class ObjectManager : MonoBehaviour
             if (change.Contains("BUL")) bul.SetNewStats();
             if (change.Contains("RK")) rk.SetNewStats();
             if (change.Contains("CBALL")) cBall.SetNewStats();
+            if (change.Contains("FB")) fb.SetNewStats();
         }
         public void SetBaseStatsAll()
         {
@@ -778,6 +915,7 @@ public class ObjectManager : MonoBehaviour
             det = new DET(1);
             pb = new PB(1);
             sb = new SB(1);
+            fb = new FB(1);
             bul = new BUL(1);
             cBall = new CBALL(1);
             rk = new RK(1);
@@ -1013,6 +1151,48 @@ public class ObjectManager : MonoBehaviour
                     obj.proj.speed = speed;
                     obj.obj.transform.localScale = scale;
                     obj.proj.effect = effect;
+                }
+            }
+        }
+        [System.Serializable]
+        public struct FB
+        {
+            public List<(GameObject obj, Projectile proj, FireSpread spr)> arr;
+            public List<GameObject> count;
+            public int dmg, curDmg;
+            public float speed, curSpeed;
+            public int effect, curEffect;
+            public Vector2 scale, curScale;
+            public bool thirdSpread;
+            public FB(int i)
+            {
+                scale = curScale = new Vector2(10f, 10f);
+                count = new(); arr = new();
+                effect = curEffect = 2;
+                thirdSpread = false;
+                speed = curSpeed = 16;
+                dmg = curDmg = 3;
+            }
+            public void SetNewStats()
+            {
+                foreach (var obj in arr)
+                {
+                    obj.proj.dmg = curDmg;
+                    obj.proj.speed = curSpeed;
+                    obj.obj.transform.localScale = curScale;
+                    obj.proj.effect = curEffect;
+                    obj.spr.thirdSpread = thirdSpread;
+                }
+            }
+            public void SetBaseStats()
+            {
+                foreach (var obj in arr)
+                {
+                    obj.proj.dmg = dmg;
+                    obj.proj.speed = speed;
+                    obj.obj.transform.localScale = scale;
+                    obj.proj.effect = effect;
+                    obj.spr.thirdSpread = thirdSpread;
                 }
             }
         }

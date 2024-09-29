@@ -149,15 +149,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57270970b29681e418f6fb1940a204a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  property: 1
-  type: 1
+  type: 0
   classType: 0
   inRange: 0
-  effect: 0
+  effect: 2
   dmg: 1
   healAmount: 0
   index: 0
-  hasWayPoins: 0
+  hasWayPoints: 0
   triggerByKeyPress: 0
   enemyTeam: 0
   lifeLeft: 0

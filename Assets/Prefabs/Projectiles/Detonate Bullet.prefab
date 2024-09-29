@@ -195,7 +195,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 9
   life: 20
-  distance: 15
+  distance: 12
   dmg: 0
   dmgVsEnemies: 0
   effect: 0

@@ -12,6 +12,7 @@ public class ObjectBank : MonoBehaviour
     public GameObject freezeBlast;
     public GameObject bombs;
     public GameObject fireSaws;
+    public GameObject toxicBarrel;
 
     [Header("Items")]
     public GameObject pBlaster;
@@ -23,12 +24,14 @@ public class ObjectBank : MonoBehaviour
     public GameObject stormHead;
     public GameObject rocketDroid;
     public GameObject droid;
+    public GameObject fireDroid;
 
     [Header("HazardsInfo")]
     public int maxFuries;
     public int maxBombs;
     public int maxSaws;
     public int maxBlasts;
+    public int maxBarrels;
     Dictionary<string, int> hazardCounts;
     Dictionary<string, int> maxHazardCounts;
     public string[] enemyNames;
@@ -52,23 +55,25 @@ public class ObjectBank : MonoBehaviour
             {"Saws", 0 },
             {"Bombs", 0 },
             {"Fury", 0 },
-            {"FreezeBlast", 0 }
+            {"FreezeBlast", 0 },
+            {"ToxicBarrel", 0 }
         };
         maxHazardCounts = new Dictionary<string, int>
         {
             { "Saws", maxSaws },
             { "Bombs", maxBombs },
             { "Fury", maxFuries },
-            { "FreezeBlast", maxBlasts }
+            { "FreezeBlast", maxBlasts },
+            {"ToxicBarrel", maxBarrels }
         };
     }
     void AddObjectsInfo()
     {
-        lvlEnemies = new GameObject[] { droid, rocketDroid, stormHead, groundDroid};
+        lvlEnemies = new GameObject[] { droid, rocketDroid, stormHead, groundDroid, fireDroid};
         lvlItems = new GameObject[] { sBlaster, heart, pBlaster};
-        lvlHazards = new GameObject[] { iceSaws, saws, fireSaws, bombs, heavensFury, freezeBlast };
-        hazardTypes = new string[] { "IceSaws", "Saws", "FireSaws", "Bombs", "Fury", "FreezeBlast" };
-        enemyNames = new string[] { "DR", "RD", "SH", "GD" };
+        lvlHazards = new GameObject[] { iceSaws, saws, fireSaws, bombs, heavensFury, freezeBlast, toxicBarrel };
+        hazardTypes = new string[] { "IceSaws", "Saws", "FireSaws", "Bombs", "Fury", "FreezeBlast", "ToxicBarrel" };
+        enemyNames = new string[] { "DR", "RD", "SH", "GD", "FD" };
     }
     public (GameObject,string) MakeHazard()
     {

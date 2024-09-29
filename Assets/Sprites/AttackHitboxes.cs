@@ -11,9 +11,7 @@ using static Unity.Burst.Intrinsics.X86.Avx;
 public class AttackHitboxes : MonoBehaviour
 {
     public Collider2D[] hitboxes;
-    private int activateInd;
-    private int deactivateInd;
-    private int nLength;
+    private int activateInd, deactivateInd, nLength;
     (GameObject pr, Projectile info)[] projectiles;
     public GameObject projectile;
     public BoxCollider2D mainHurtBox, plCol;
@@ -21,10 +19,11 @@ public class AttackHitboxes : MonoBehaviour
     [SerializeField] public AggroBox aggro;
     [SerializeField] public int dmg, effect, cap;
     Player player;
-    [HideInInspector] public float timeLeft, cooldown;
+    public float timeLeft, cooldown;
     [SerializeField] private Transform drawPoint,firePoint;
-    bool inRange, canAttack, attacking;
+    bool canAttack, attacking;
     public bool hasAggroBox, draw;
+    public bool inRange;
     public Color aggroBoxColor;
     Animator ani;
  
@@ -33,7 +32,11 @@ public class AttackHitboxes : MonoBehaviour
     {
         player = Player.Ins;
         plCol = player.GetComponent<BoxCollider2D>();
-        if (hasAggroBox) aggro = new AggroBox(mainHurtBox.bounds, aggroRange, player);
+        if (hasAggroBox)
+        {
+            if (mainHurtBox != null) aggro = new AggroBox(mainHurtBox.bounds, aggroRange, player);
+            else { aggro = new AggroBox(hitboxes[0].bounds, aggroRange, player); }
+        }
         DeactivateAll();
         ani = GetComponent<Animator>();
         nLength = hitboxes.Length;
@@ -116,10 +119,12 @@ public class AttackHitboxes : MonoBehaviour
     }
     private void OnEnable() => DeactivateAll();
     
-    
-    private void OnTriggerEnter2D(Collider2D col) { 
-        if (col.CompareTag("Player"))
+    private void OnTriggerEnter2D(Collider2D col) {
+        print(col.name);
+        if (col.CompareTag("Player")) {
+            print("hit player");
             player.TakeDamage(dmg, effect);
+        }
     }
 
     [System.Serializable]
@@ -209,6 +214,6 @@ public class AttackHitboxes : MonoBehaviour
     {
         Gizmos.color = aggroBoxColor;
 
-        if (draw) Gizmos.DrawCube(drawPoint.position, aggroRange);
+        if (draw) Gizmos.DrawCube(aggro.center, aggroRange);
     }
 }
