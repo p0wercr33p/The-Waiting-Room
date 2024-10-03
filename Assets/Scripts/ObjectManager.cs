@@ -9,6 +9,8 @@ using static Obstacle;
 public class ObjectManager : MonoBehaviour
 {
     public static ObjectManager Ins;
+    PlayerHealth pHP;
+    Player pl;
     public string curMod;
     public bool Plus;
     public string[] mods; 
@@ -22,6 +24,7 @@ public class ObjectManager : MonoBehaviour
     public Projectiles Projs;
     public HeavensFuries Furies;
     public _Toxic Toxic;
+    public _FreezeBlast Freeze;
     private void Awake() {
         Ins = this;
         Droids = new DROIDS(1);
@@ -33,12 +36,14 @@ public class ObjectManager : MonoBehaviour
         Furies = new HeavensFuries(1);
         Toxic = new _Toxic(1);
         Fire = new _Flames(1);
+        Freeze = new _FreezeBlast(1);
         ind = 0;
-        mods = new string[] { 
+        mods = new string[] {
             "Bigger Bombs", "Tankier Tanks", "Amber Alert", "Hasty Rockets", "Bigger Gun Diplomacy",
             "Schrodinger's Damager Numbers", "Property Purgatory", "Newton's New Law",
-            "Wrath Of The Gods", "Foot Soldier", "Slower Than A Speeding Bullet", 
-            "Give Me Liberty Give Me Fire", "Make Love Not Waste"
+            "Wrath Of The Gods", "Foot Soldier", "Slower Than A Speeding Bullet",
+            "Give Me Liberty Give Me Fire", "Make Love Not Waste", "Multi Multishot", "More Damage",
+            "Half Able-Bodied", "Fool's Gambit", "Better Bombs", "Scorched Earth"
         };
         curMod = mods[ind];
     }
@@ -55,6 +60,94 @@ public class ObjectManager : MonoBehaviour
         {
             ind = (ind + 1) % mods.Length;
             curMod = mods[ind];
+        }
+    }
+    public void AddObject(GameObject add, string type, string classType)
+    {
+        switch (classType)
+        {
+            case "Hazard":
+                Obstacle o = add.GetComponent<Obstacle>();
+                MovingObject wp = add.GetComponent<MovingObject>();
+                switch (type)
+                {
+                    case "ToxicBarrel":
+                        GasSpread gas = add.GetComponentInChildren<GasSpread>();
+                        AttackHitboxes att = add.GetComponentInChildren<AttackHitboxes>();
+                        Toxic.arr.Add((add, gas, att));
+                        Toxic.count.Add(add); break;
+                    case "Fire": Fire.arr.Add((add, o)); Fire.count.Add(add); break;
+                    case "Saws":
+                        Saws.elec.arr.Add((add, o, wp)); Saws.elec.count.Add(add);
+                        break;
+                    case "IceSaws": Saws.ice.arr.Add((add, o, wp)); Saws.ice.count.Add(add); break;
+                    case "FireSaws": Saws.fire.arr.Add((add, o, wp)); Saws.fire.count.Add(add); break;
+                    case "Bombs":
+                        Throwable t2 = add.GetComponent<Throwable>();
+                        Bombs.arr.Add((add, o, t2)); Bombs.count.Add(add);
+                        break;
+                    case "Explosion":
+                        Explosions.arr.Add((add, o));
+                        break;
+                    case "Fury":
+                        Furies.arr.Add((add, o)); Furies.count.Add(add);
+                        break;
+                    case "FreezeBlast":
+                        Freeze.arr.Add((add, add.GetComponentInChildren<Multishot>(), wp)); Freeze.count.Add(add);
+                        break;
+                }
+                break;
+
+            case "Cannon":
+                Enemy enemy = add.GetComponent<Enemy>();
+                MovingObject mO = add.GetComponent<MovingObject>();
+                switch (type)
+                {
+                    case "CN":
+                        Cannons.cn.arr.Add((add, enemy)); Cannons.cn.count.Add(add); break;
+                    case "MCN":
+                        Cannons.mcn.arr.Add((add, mO, enemy)); Cannons.mcn.count.Add(add); break;
+                    case "LC":
+                        Cannons.lc.arr.Add((add, enemy)); Cannons.lc.count.Add(add); break;
+                    case "MLC":
+                        Cannons.mlc.arr.Add((add, mO, enemy)); Cannons.mlc.count.Add(add); break;
+                }
+                break;
+
+            case "Droid":
+                Enemy ene = add.GetComponent<Enemy>();
+                AttackHitboxes aH = add.GetComponent<AttackHitboxes>();
+                MovingObject mO2 = add.GetComponent<MovingObject>();
+                AIPath ai = add.GetComponent<AIPath>();
+                HealthData HP = add.GetComponent<HealthData>();
+                switch (type)
+                {
+                    case "FD": Droids.fd.arr.Add((add, ene, ai, HP)); Droids.fd.count.Add(add); break;
+                    case "SH":
+                        Droids.sh.arr.Add((add, aH, mO2, HP)); Droids.sh.count.Add(add); break;
+                    case "GD":
+                        Droids.gd.arr.Add((add, aH, mO2, HP)); Droids.gd.count.Add(add); break;
+                    case "DR":
+                        Droids.dr.arr.Add((add, ene, ai, HP)); Droids.dr.count.Add(add); break;
+                    case "RD":
+                        Droids.rd.arr.Add((add, ene, ai, HP)); Droids.rd.count.Add(add); break;
+                }
+                break;
+
+            case "Projectile":
+                Projectile pr = add.GetComponent<Projectile>();
+                switch (type)
+                {
+                    case "DET": Projs.det.arr.Add((add, pr)); Projs.det.count.Add(add); break;
+                    case "RK": Projs.rk.arr.Add((add, pr, add.GetComponent<AIPath>())); Projs.rk.count.Add(add); break;
+                    case "BUL": Projs.bul.arr.Add((add, pr)); Projs.bul.count.Add(add); break;
+                    case "PB": Projs.pb.arr.Add((add, pr)); Projs.pb.count.Add(add); break;
+                    case "SB": Projs.sb.arr.Add((add, pr)); Projs.sb.count.Add(add); break;
+                    case "FB": Projs.fb.arr.Add((add, pr, add.GetComponent<FireSpread>())); Projs.fb.count.Add(add); break;
+                    case "CBALL": Projs.cBall.arr.Add((add, pr)); Projs.cBall.count.Add(add); break;
+                    case "ORB": Projs.orb.arr.Add((add, pr)); Projs.orb.count.Add(add); break;
+                }
+                break;
         }
     }
     public void AddMod(string ModToAdd)
@@ -74,7 +167,48 @@ public class ObjectManager : MonoBehaviour
             case "Slower Than A Speeding Bullet": SlowerThanASpeedingBullet(Plus); break;
             case "Give Me Liberty Give Me Fire": GiveMeLibertyGiveMeFire(Plus); break;
             case "Make Love Not Waste": MakeLoveNotWaste(Plus); break;
+            case "Multi Multishot": MultiMultiShot(); break;
+            case "More Damage": MoreDamage(Plus); break;
+            case "Half Able-Bodied": HalfAbleBodied(Plus); break;
+            case "Fool's Gambit": FoolsGambit(Plus); break;
+            case "Better Bombs": BetterBombs(Plus); break;
+            case "Scorched Earth": ScorchedEarth(Plus); break;
         }
+    }
+    public void ScorchedEarth(bool plus = false)
+    {
+        // Fire spreads 50% faster and lasts 50% longer
+        // Plus+ -- 100% faster, 75% longer
+        foreach (var fireball in Projs.fb.arr)
+            fireball.spr.spreadTimer = plus ? 1.25f : 1.75f;
+
+        Fire.curLifeTime = Fire.lifeTime * (plus ? 1.75f : 1.5f);
+        Fire.SetNewStats();
+    }
+    public void BetterBombs(bool plus = false)
+    {
+        // Bombs explode 50% faster
+        // Plus+ -- 100% faster
+        Bombs.curLifeTime /= plus ? 2 : 1.5f;
+        Bombs.SetNewStats();
+    }
+    public void FoolsGambit(bool plus = false)
+    {
+        // Apply two random mods, excluding itself
+        // But you get 1 random player upgrade
+        // Plus+ -- Apply 3 random mods, get 2 player upgrades
+        int ran = plus ? 3 : 2;
+
+        var ranMods = new List<string>();
+        foreach (var mod in mods)
+            ranMods.Add(mod);
+        ranMods.Remove("Fool's Gambit");
+        int ranMod = UnityEngine.Random.Range(0, ranMods.Count);
+        AddMod(ranMods[ranMod]);
+        ranMods.RemoveAt(ranMod);
+
+        ranMod = UnityEngine.Random.Range(0, ranMods.Count);
+        AddMod(ranMods[ranMod]);
     }
     public void BiggerGunDiplomacy(bool plus = false)
     {
@@ -82,15 +216,34 @@ public class ObjectManager : MonoBehaviour
         // Plus+ -- 50% bigger. 2 extra damage
         int dmg = plus ? 2 : 1;
         float scaleInc = plus ? 1.5f : 1.35f;
-        Cannons.lc.curDmg += dmg;
+        Cannons.lc.curDmg = Cannons.lc.dmg + dmg;
         Cannons.lc.curScale = Cannons.lc.scale * scaleInc;
-        Cannons.mlc.curDmg += dmg;
+        Cannons.mlc.curDmg = Cannons.mlc.dmg + dmg;
         Cannons.mlc.curScale = Cannons.mlc.scale * scaleInc;
         Cannons.cn.curScale = Cannons.cn.scale * scaleInc;
         Cannons.mcn.curScale = Cannons.mcn.scale * scaleInc;
-        Projs.cBall.curDmg += dmg;
+        Projs.cBall.curDmg = Projs.cBall.dmg + dmg;
         Projs.cBall.SetNewStats();
         Cannons.SetNewStatsAll();
+    }
+    public void HalfAbleBodied(bool plus = false)
+    {
+        // You can have two status effects at once
+        // Plus+ -- 3 at once. All status effects last 25% longer
+        pHP.maxEffects = plus ? 3 : 2;
+        if (plus){
+            pHP.acidicTimer *= 1.25f;
+            pHP.fireTimer *= 1.25f;
+            pHP.iceTimer *= 1.25f;
+            pHP.shockTimer *= 1.25f;
+        }
+    }
+    public void MoreDamage(bool plus = false)
+    {
+        // All damage sources deal 50% more damage
+        // Plus+ -- 100%
+        // RED
+        pHP.defense += plus ? 1 : .5f;
     }
     public void BiggerBombs(bool plus = false)
     {
@@ -107,7 +260,7 @@ public class ObjectManager : MonoBehaviour
         // All fire is 100% bigger and deals 2 extra damage
         // Plus+ -- fire gets 120% bigger and fire spreads cause 2 extra flames
         Fire.curScale *= plus ? 2.2f : 2f;
-        Fire.curDmg += 2;
+        Fire.curDmg = Fire.dmg + 2;
         Projs.fb.thirdSpread = plus;
         Fire.SetNewStats();
         Projs.fb.SetNewStats();
@@ -162,6 +315,11 @@ public class ObjectManager : MonoBehaviour
     {
         // Bullets and Cannon Fire are 50% faster
         // Plus+ -- 100%: Yellow
+        Cannons.cn.curCD = Cannons.cn.curCD * (plus ? 2 : 1.5f);
+        Cannons.mcn.curCD = Cannons.cn.curCD * (plus ? 2 : 1.5f);
+        Cannons.lc.curCD = Cannons.cn.curCD * (plus ? 2 : 1.5f);
+        Cannons.mlc.curCD = Cannons.cn.curCD * (plus ? 2 : 1.5f);
+        Cannons.SetNewStatsAll();
         Projs.bul.curSpeed = Projs.bul.speed * (plus ? 2 : 1.5f);
         Projs.cBall.curSpeed = Projs.cBall.speed * (plus ? 2 : 1.5f);
         Projs.SetNewStatsAll(new HashSet<string> { "CBALL", "BUL"});
@@ -180,11 +338,20 @@ public class ObjectManager : MonoBehaviour
         }
         Toxic.SetNewStats();
     }
+    public void MultiMultiShot(bool plus = false)
+    {
+        // Freeze Blasters will shoot a second round after the first
+        // Plus+ -- So can Droids
+        Freeze.secondRound = true;
+        Freeze.SetNewStats();
+    }
     public void NewtonsNewLaw()
     {
-        // Elemental Hazards now move
+        // Elemental Hazards and Freeze Blasters now move
         Saws.active = true;
+        Freeze.active = true;
         Saws.SetNewStatsAll();
+        Freeze.SetNewStats();
     }
     public void PropertyPurgatory(bool plus = false)
     {
@@ -198,8 +365,8 @@ public class ObjectManager : MonoBehaviour
         Projs.pb.curEffect = UnityEngine.Random.Range(min, 5);
         Projs.sb.curEffect = UnityEngine.Random.Range(min, 5);
         Projs.fb.curEffect = UnityEngine.Random.Range(min, 5);
-
-        Projs.SetNewStatsAll(new HashSet<string> { "CBALL", "BUL","RK","PB","SB", "FB" });
+        Projs.orb.curEffect = UnityEngine.Random.Range(min, 5);
+        Projs.SetNewStatsAll(new HashSet<string> { "CBALL", "BUL","RK","PB","SB", "FB", "ORB" });
     }
     public void SchrodingersDamagerNumbers(bool plus = false)
     {
@@ -212,7 +379,8 @@ public class ObjectManager : MonoBehaviour
         Projs.pb.curDmg = UnityEngine.Random.Range(minRange, max);
         Projs.sb.curDmg = UnityEngine.Random.Range(minRange, max);
         Projs.fb.curDmg = UnityEngine.Random.Range(minRange, max);
-        Projs.SetNewStatsAll(new HashSet<string> { "CBALL", "BUL", "RK","PB","SB", "FB" });
+        Projs.orb.curDmg = UnityEngine.Random.Range(minRange, max);
+        Projs.SetNewStatsAll(new HashSet<string> { "CBALL", "BUL", "RK","PB","SB", "FB", "ORB" });
         Explosions.curDmg = UnityEngine.Random.Range(minRange, max);
         Explosions.SetNewStats();
         Furies.curDmg = UnityEngine.Random.Range(minRange, max);
@@ -227,91 +395,7 @@ public class ObjectManager : MonoBehaviour
         Droids.sh.curDmg = UnityEngine.Random.Range(minRange, max);
         Droids.SetNewStatsAll(new HashSet<string>() { "SH" });
     }
-    public void AddObject(GameObject add, string type, string classType)
-    {
-        switch (classType)
-        {
-            case "Hazard":
-                Obstacle o = add.GetComponent<Obstacle>();
-                MovingObject wp = add.GetComponent<MovingObject>();
-                switch (type)
-                {
-                    case "ToxicBarrel":
-                        GasSpread gas = add.GetComponentInChildren<GasSpread>();
-                        AttackHitboxes att = add.GetComponentInChildren<AttackHitboxes>();
-                        Toxic.arr.Add((add, gas, att));
-                        Toxic.count.Add(add); break;
-                    case "Fire": Fire.arr.Add((add, o)); Fire.count.Add(add); break;
-                    case "Saws":
-                        Saws.elec.arr.Add((add, o,wp)); Saws.elec.count.Add(add);
-                        break;
-                    case "IceSaws": Saws.ice.arr.Add((add, o,wp)); Saws.ice.count.Add(add); break;
-                    case "FireSaws": Saws.fire.arr.Add((add, o,wp)); Saws.fire.count.Add(add); break;
-                    case "Bombs":
-                        Throwable t2 = add.GetComponent<Throwable>();
-                        Bombs.arr.Add((add, o, t2)); Bombs.count.Add(add);
-                        break;
-                    case "Explosions":
-                        Explosions.arr.Add((add, o));
-                        break;
-                    case "Fury":
-                        Furies.arr.Add((add, o)); Furies.count.Add(add);
-                        break;
-                }
-                break;
-
-            case "Cannon":
-                Enemy enemy = add.GetComponent<Enemy>();
-                MovingObject mO = add.GetComponent<MovingObject>();
-                switch (type)
-                {
-                    case "CN":
-                        Cannons.cn.arr.Add((add, enemy)); Cannons.cn.count.Add(add); break;
-                    case "MCN":
-                        Cannons.mcn.arr.Add((add, mO, enemy)); Cannons.mcn.count.Add(add);  break;
-                    case "LC":
-                        Cannons.lc.arr.Add((add, enemy)); Cannons.lc.count.Add(add);  break;
-                    case "MLC":
-                        Cannons.mlc.arr.Add((add, mO, enemy)); Cannons.mlc.count.Add(add);  break;
-                }
-                break;
-
-            case "Droid":
-                Enemy ene = add.GetComponent<Enemy>();
-                AttackHitboxes aH = add.GetComponent<AttackHitboxes>();
-                MovingObject mO2 = add.GetComponent<MovingObject>();
-                AIPath ai = add.GetComponent<AIPath>();
-                HealthData HP = add.GetComponent<HealthData>();
-                switch (type)
-                {
-                    case "FD": Droids.fd.arr.Add((add, ene, ai, HP)); Droids.fd.count.Add(add); break;
-                    case "SH":
-                        Droids.sh.arr.Add((add, aH, mO2, HP)); Droids.sh.count.Add(add); break;
-                    case "GD":
-                        Droids.gd.arr.Add((add, aH, mO2,HP)); Droids.gd.count.Add(add);  break;
-                    case "DR":
-                        Droids.dr.arr.Add((add, ene, ai,HP)); Droids.dr.count.Add(add); break;
-                    case "RD":
-                        Droids.rd.arr.Add((add, ene, ai,HP)); Droids.rd.count.Add(add); break;
-                }
-                break;
-
-            case "Projectile":
-                Projectile pr = add.GetComponent<Projectile>();
-                switch (type)
-                {
-                    case "DET": Projs.det.arr.Add((add, pr)); Projs.det.count.Add(add); break;
-                    case "RK": Projs.rk.arr.Add((add, pr, add.GetComponent<AIPath>())); Projs.rk.count.Add(add); break;
-                    case "BUL": Projs.bul.arr.Add((add, pr)); Projs.bul.count.Add(add);  break;
-                    case "PB": Projs.pb.arr.Add((add, pr)); Projs.pb.count.Add(add);  break;
-                    case "SB": Projs.sb.arr.Add((add, pr)); Projs.sb.count.Add(add);  break;
-                    case "FB": Projs.fb.arr.Add((add, pr, add.GetComponent<FireSpread>())); Projs.fb.count.Add(add); break;
-                    case "CBALL": Projs.cBall.arr.Add((add, pr)); Projs.cBall.count.Add(add);  break;
-                }
-                break;
-            
-        }
-    }
+    
 
     [System.Serializable]
     public struct _Toxic
@@ -507,7 +591,6 @@ public class ObjectManager : MonoBehaviour
             }
         }
     }
-
     [System.Serializable]
     public struct _Explosions {
         public List<(GameObject obj, Obstacle obs)> arr;
@@ -540,6 +623,43 @@ public class ObjectManager : MonoBehaviour
             }
             curDmg = dmg;
             curScale = scale;
+        }
+    }
+    [System.Serializable]
+    public struct _FreezeBlast
+    {
+        public List<(GameObject obj, Multishot ms, MovingObject wp)> arr;
+        public List<GameObject> count;
+        public int cooldown, curCD;
+        public bool secondRound, active;
+
+        public _FreezeBlast(int i)
+        {
+            arr = new();
+            count = new();
+            cooldown = curCD = 6;
+            secondRound = active = false;
+        }
+
+        public void SetNewStats()
+        {
+            foreach (var blast in arr)
+            {
+                blast.ms.cooldown = curCD;
+                blast.ms.secondRound = secondRound;
+                blast.wp.enabled = active;
+            }
+        }
+        public void SetBaseStats()
+        {
+            foreach (var blast in arr)
+            {
+                blast.ms.cooldown = cooldown;
+                blast.ms.secondRound = secondRound;
+                blast.wp.enabled = active;
+            }
+            curCD = cooldown;
+            secondRound = active = false;
         }
     }
     [System.Serializable]
@@ -891,6 +1011,7 @@ public class ObjectManager : MonoBehaviour
         public CBALL cBall;
         public RK rk;
         public FB fb;
+        public ORB orb;
         public void SetNewStatsAll(HashSet<string> change)
         {
             if (change.Contains("DET")) det.SetNewStats();
@@ -900,6 +1021,7 @@ public class ObjectManager : MonoBehaviour
             if (change.Contains("RK")) rk.SetNewStats();
             if (change.Contains("CBALL")) cBall.SetNewStats();
             if (change.Contains("FB")) fb.SetNewStats();
+            if (change.Contains("ORB")) orb.SetNewStats();  
         }
         public void SetBaseStatsAll()
         {
@@ -909,6 +1031,7 @@ public class ObjectManager : MonoBehaviour
             bul.SetBaseStats();
             rk.SetBaseStats();
             cBall.SetBaseStats();
+            orb.SetBaseStats();
         }
         public Projectiles(int i)
         {
@@ -917,6 +1040,7 @@ public class ObjectManager : MonoBehaviour
             sb = new SB(1);
             fb = new FB(1);
             bul = new BUL(1);
+            orb = new ORB(1);
             cBall = new CBALL(1);
             rk = new RK(1);
         }
@@ -953,6 +1077,44 @@ public class ObjectManager : MonoBehaviour
                 {
                     obj.proj.speed = speed;
                     obj.proj.distance = dist;
+                    obj.obj.transform.localScale = scale;
+                    obj.proj.effect = effect;
+                }
+            }
+        }
+        [System.Serializable]
+        public struct ORB
+        {
+            public List<(GameObject obj, Projectile proj)> arr;
+            public List<GameObject> count;
+            public float speed, curSpeed;
+            public Vector2 scale, curScale;
+            public int dmg, curDmg;
+            public int effect, curEffect;
+            public ORB(int i)
+            {
+                scale = curScale = new Vector2(9f, 9f);
+                count = new(); arr = new();
+                effect = curEffect = 1;
+                speed = curSpeed = 9;
+                dmg = curDmg = 2;
+            }
+            public void SetNewStats()
+            {
+                foreach (var obj in arr)
+                {
+                    obj.proj.speed = curSpeed;
+                    obj.proj.dmg = curDmg;
+                    obj.obj.transform.localScale = curScale;
+                    obj.proj.effect = curEffect;
+                }
+            }
+            public void SetBaseStats()
+            {
+                foreach (var obj in arr)
+                {
+                    obj.proj.speed = speed;
+                    obj.proj.distance = dmg;
                     obj.obj.transform.localScale = scale;
                     obj.proj.effect = effect;
                 }

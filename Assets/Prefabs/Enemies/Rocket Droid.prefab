@@ -212,7 +212,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   version: 1
   drawGizmos: 1
-  detailedGizmos: 1
+  detailedGizmos: 0
   startEndModifier:
     addPoints: 0
     exactStartPoint: 3
@@ -316,7 +316,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   projectile: {fileID: 7088820785956754215, guid: 218689aad8ddaf9428cac1ac501e76ab, type: 3}
-  dummyRainbow: []
   spR: {fileID: 0}
   laserLine: {fileID: 0}
   cap: 3

@@ -10,7 +10,7 @@ public class Enemy : MonoBehaviour
     public enum BulletType { PROJECTILE, LASER, HITSCAN };
     Animator ani;
     public BulletType bullet;
-    public EnemyType type; string playerTag; Player player;
+    public EnemyType type; string playerTag; Player player; PlayerHealth pHP;
     (GameObject pr, Projectile info)[] projectiles;
     public LayerMask laserMask;
     public GameObject projectile;
@@ -38,6 +38,7 @@ public class Enemy : MonoBehaviour
     }
     void Start() {
         player = Player.Ins;
+        pHP = PlayerHealth.Ins;
         InitializeProjectiles();
         if (firePoint == null) firePoint = this.transform;
         if (!hasFollowAI) inShootRange = true;
@@ -131,7 +132,7 @@ public class Enemy : MonoBehaviour
 
         if (laserHit){
             DrawLaser(firePoint.position, laserHit.point);
-            if (laserHit.transform.tag == playerTag) player.TakeDamage(contactDmg);
+            if (laserHit.transform.tag == playerTag) pHP.TakeDamage(contactDmg);
         }else{
             Vector2 endPos = (Vector2)transform.position + dir * maxLaserDist;
             DrawLaser(firePoint.position, endPos);
@@ -190,7 +191,7 @@ public class Enemy : MonoBehaviour
     {
         if (collision.CompareTag(playerTag) && contactDmg > 0)
         {
-            player.TakeDamage(contactDmg);
+            pHP.TakeDamage(contactDmg);
         }
     }
     private void OnDrawGizmos()

@@ -22,6 +22,8 @@ public class EnemyAI : MonoBehaviour
         curScale = scale;
         playerTag = "Player";
         player = pl.transform;
+        curScale.x = scale.x * Mathf.Sign(transform.position.x - player.position.x);
+        transform.localScale = curScale;
     }
 
 
@@ -46,7 +48,7 @@ public class EnemyAI : MonoBehaviour
     }
     public void LateUpdate()
     {
-        curScale.x = scale.x * Mathf.Sign(transform.position.x - player.position.x);
+        curScale.x = scale.x * Mathf.Sign(transform.position.x + player.position.x);
         transform.localScale = curScale;
     }
 }

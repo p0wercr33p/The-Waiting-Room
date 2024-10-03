@@ -21,7 +21,7 @@ public class Manager : MonoBehaviour
     public Vector2[] hazardPoints, itemPoints, enemyPoints; 
     public CannonData[] cannonData;
     int levelHazards, levelItems, levelCannons, levelEnemies;
-    public bool draw;
+    public bool[] draw;
 
     private void Awake()
     {
@@ -300,28 +300,28 @@ public class Manager : MonoBehaviour
 
         for (int i = 0; i < hazardPoints.Length; i++)
         {
-            if (!draw) break;
+            if (!draw[0]) break;
             Gizmos.DrawLine(hazardPoints[i] - Vector2.up * .4f, hazardPoints[i] + Vector2.up * .4f);
             Gizmos.DrawLine(hazardPoints[i] - Vector2.left * .4f, hazardPoints[i] + Vector2.left * .4f);
         }
         Gizmos.color = Color.yellow;
         for (int i = 0; i < itemPoints.Length; i++)
         {
-            if (!draw) break;
+            if (!draw[1]) break;
             Gizmos.DrawLine(itemPoints[i] - Vector2.up * .4f, itemPoints[i] + Vector2.up * .4f);
             Gizmos.DrawLine(itemPoints[i] - Vector2.left * .4f, itemPoints[i] + Vector2.left * .4f);
         }
         Gizmos.color = Color.white;
         for (int i = 0; i < cannonData.Length; i++)
         {
-            if (draw) break;
+            if (!draw[2]) break;
             Gizmos.DrawLine(cannonData[i].pos - Vector2.up * .4f, cannonData[i].pos + Vector2.up * .4f);
             Gizmos.DrawLine(cannonData[i].pos - Vector2.left * .4f, cannonData[i].pos + Vector2.left * .4f);
         }
         Gizmos.color = Color.red;
         for (int i = 0; i < enemyPoints.Length; i++)
         {
-            if (draw) break;
+            if (!draw[3]) break;
             Gizmos.DrawLine(enemyPoints[i] - Vector2.up * .4f, enemyPoints[i] + Vector2.up * .4f);
             Gizmos.DrawLine(enemyPoints[i] - Vector2.left * .4f, enemyPoints[i] + Vector2.left * .4f);
         }

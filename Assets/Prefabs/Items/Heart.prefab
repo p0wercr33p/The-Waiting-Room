@@ -116,6 +116,7 @@ MonoBehaviour:
     m_Bits: 72
   throwForce: {x: 0.5, y: 0.4}
   grabHitBox: {x: 2.5, y: 2.5}
+  offset: {x: 0, y: 0}
   isFloating: 0
   beingCarried: 0
   inRange: 0
@@ -123,6 +124,7 @@ MonoBehaviour:
   gravity: -3
   grabBox:
     center: {x: 0, y: 0}
+    offset: {x: 0, y: 0}
     right: 0
     left: 0
     top: 0

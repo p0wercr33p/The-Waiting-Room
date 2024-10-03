@@ -24,8 +24,7 @@ public class Obstacle : MonoBehaviour
     Throwable throwable;
     public GameObject[] triggerObjs; Collider2D hitbox;
     Manager manager;
-    SpriteRenderer sprite; Player player; GameObject explosion;
-
+    SpriteRenderer sprite; PlayerHealth player; GameObject explosion;
 
     private void Awake()
     {
@@ -37,19 +36,24 @@ public class Obstacle : MonoBehaviour
     }
     void Start()
     {
-        player = Player.Ins;
+        player = PlayerHealth.Ins;
         manager = Manager.Ins;
         if (type == ObstacleType.FURY){
             dmg = 4;
             int ran = UnityEngine.Random.Range(0,10);
             if (ran > 4){
                 transform.rotation = Quaternion.Euler(0, 0, 90f);
-                transform.position = new Vector2(45, transform.position.y);
+                transform.position = new Vector2(85, transform.position.y);
             } else{
-                transform.position = new Vector2(transform.position.x, -9);
+                transform.position = new Vector2(transform.position.x, -20);
             }
         }
-        if (type == ObstacleType.BOMB) { explosion = Instantiate(triggerObjs[0]); explosion.SetActive(false); throwable = GetComponent<Throwable>(); }
+        if (type == ObstacleType.BOMB) { 
+            explosion = Instantiate(triggerObjs[0]); 
+            explosion.SetActive(false); 
+            throwable = GetComponent<Throwable>();
+            ObjectManager.Ins.AddObject(explosion, "Explosion", "Hazard");
+        }
         lifeLeft = lifeTimer;
   
     }
@@ -153,15 +157,13 @@ public class Obstacle : MonoBehaviour
         }
         if (type == ObstacleType.EXPLOSION || type == ObstacleType.FURY || type == ObstacleType.FIRE)
         {
-            if (coll.CompareTag("Item"))
+            if (coll.CompareTag("Item") || coll.CompareTag("Bomb"))
             {
                 if (!itemBook.ContainsKey(coll.transform))
                     itemBook[coll.transform] = coll.GetComponent<Throwable>();
                 itemBook[coll.transform].HandleDestruction();
-            }
-            else if (coll.CompareTag("Bomb")) coll.GetComponent<Throwable>().HandleDestruction();
-            else if (!enemyTeam && coll.CompareTag("Enemy"))
-            {
+
+            }else if (!enemyTeam && coll.CompareTag("Enemy")){
                 if (!enemyBook.ContainsKey(coll.transform))
                     enemyBook[coll.transform] = coll.GetComponent<HealthData>();
                 enemyBook[coll.transform].TakeDamage(dmg);

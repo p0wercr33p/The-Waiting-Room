@@ -1,3 +1,5 @@
+using Microsoft.Win32.SafeHandles;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.ShaderGraph.Internal;
@@ -9,7 +11,7 @@ public class MovingObject : RaycastController
     public LayerMask pMask, waypointMask; 
     int n;
     BoxCollider2D col;
-    public Vector3[] waypoints, globalWP;
+    public Vector2[] waypoints, globalWP;
     public float speed;
     public enum ObjectType { PLATFORM, ENEMY, OBJECT}
     public ObjectType type;
@@ -19,11 +21,11 @@ public class MovingObject : RaycastController
     Dictionary<Transform, Controller> passport;
     Dictionary<Transform, Throwable> luggage;
     public Color wpcolor;
-    public SpriteRenderer sprite;
     Enemy enemy;
     Vector2 scale, curScale;
     List<PassengerMovement> pMovement;
-    public bool global;
+    public bool global, bounce;
+    public int minBounces, maxBounces;
 
     public override void Awake()
     {
@@ -31,8 +33,6 @@ public class MovingObject : RaycastController
     }
     public override void Start()
     {
-        sprite = GetComponent<SpriteRenderer>();
-        sprite.enabled = false;
         base.Start(); 
         passport = new();
         luggage = new();
@@ -42,9 +42,11 @@ public class MovingObject : RaycastController
         {
             case ObjectType.PLATFORM: wpcolor = Color.green; SetWaypoints(); break;
             case ObjectType.ENEMY: wpcolor = Color.red; SetEnemyWayPoints(); break;
-            case ObjectType.OBJECT: wpcolor = Color.yellow; SetObjectWaypoints(); break;
+            case ObjectType.OBJECT: wpcolor = Color.yellow;
+                if (!bounce) SetObjectWaypoints();
+                else SetBounceWaypoints();
+                break;
         }
-        sprite.enabled = true;
     }
     void SetObjectWaypoints()
     {
@@ -62,23 +64,61 @@ public class MovingObject : RaycastController
         float hitPointY2 = dir.y == 0 ? hit2.point.y : hit2.point.y + dir.y;
 
 
-        waypoints = new Vector3[3];
+        waypoints = new Vector2[3];
         waypoints[0] = point;
         waypoints[1] = new Vector2(hitPointX1, hitPointY1);
         waypoints[2] = new Vector2(hitPointX2, hitPointY2);
 
-        globalWP = new Vector3[waypoints.Length];
+        globalWP = new Vector2[waypoints.Length];
         for (int i = 0; i < waypoints.Length; i++)
         {
-            globalWP[i] = global ? waypoints[i] : waypoints[i] + transform.position;
+            globalWP[i] = global ? waypoints[i] : waypoints[i] + (Vector2)transform.position;
+        }
+    }
+    void SetBounceWaypoints()
+    {
+        int ran = UnityEngine.Random.Range(0, 4);
+        int bounces = UnityEngine.Random.Range(minBounces, maxBounces);
+        Vector2 dir = new Vector2(0, 0);
+        switch (ran)
+        {
+            case 0: dir = new Vector2(1, 1); break;
+            case 1: dir = new Vector2(1, -1); break;
+            case 2: dir = new Vector2(-1, 1); break;
+            case 3: dir = new Vector2(-1, -1); break;
+        }
+        Vector2 point = transform.position;
+        waypoints = new Vector2[bounces+1];
+        Array.Fill(waypoints, Vector2.zero);
+        waypoints[0] = point;
+
+        for (int i = 0; i < bounces; i++)
+        {
+            // hit will ALWAYS hit. its in a small romm with no gaps or void
+            RaycastHit2D hit = Physics2D.Raycast(point, dir, 100f, waypointMask);
+            if (hit.collider == null) { break; }
+        
+            float hitPointX = hit.point.x - dir.x;
+            float hitPointY = hit.point.y - dir.y;
+            point = new Vector2(hitPointX, hitPointY);
+            waypoints[i + 1] = point;
+
+            Vector2 normal = hit.normal;
+            if (Mathf.Abs(normal.y) > Mathf.Abs(normal.x)) dir.y *= -1; 
+            else dir.x *= -1; 
+        }
+        globalWP = new Vector2[waypoints.Length];
+        for (int i = 0; i < waypoints.Length; i++)
+        {
+            globalWP[i] = global ? waypoints[i] : waypoints[i] + (Vector2)transform.position;
         }
     }
     void SetWaypoints()
     {
-        globalWP = new Vector3[waypoints.Length];
+        globalWP = new Vector2[waypoints.Length];
         for (int i = 0; i < waypoints.Length; i++)
         {
-            globalWP[i] = global ? waypoints[i] : waypoints[i] + transform.position;
+            globalWP[i] = global ? waypoints[i] : waypoints[i] + (Vector2)transform.position;
         }
     }
     public void SetEnemyWayPoints()
@@ -101,21 +141,21 @@ public class MovingObject : RaycastController
 
 
 
-        float hitPointX1 = dir.x == 0 ? hit1.point.x : hit1.point.x - dir.x;
-        float hitPointY1 = dir.y == 0 ? hit1.point.y : hit1.point.y - dir.y;
-        float hitPointX2 = dir.x == 0 ? hit2.point.x : hit2.point.x + dir.x;
-        float hitPointY2 = dir.y == 0 ? hit2.point.y : hit2.point.y + dir.y;
+        float hitPointX1 = hit1.point.x - dir.x;
+        float hitPointY1 = hit1.point.y - dir.y;
+        float hitPointX2 = hit2.point.x + dir.x;
+        float hitPointY2 = hit2.point.y + dir.y;
 
 
-        waypoints = new Vector3[3];
+        waypoints = new Vector2[3];
         waypoints[0] = point;
         waypoints[1] = new Vector2(hitPointX1, hitPointY1);
         waypoints[2] = new Vector2(hitPointX2, hitPointY2);
 
-        globalWP = new Vector3[waypoints.Length];
+        globalWP = new Vector2[waypoints.Length];
         for (int i = 0; i < waypoints.Length; i++)
         {
-            globalWP[i] = global ? waypoints[i] : waypoints[i] + transform.position;
+            globalWP[i] = global ? waypoints[i] : waypoints[i] + (Vector2)transform.position;
         }
         if (!walker) enemy.Rotate();
     }
@@ -267,7 +307,7 @@ public class MovingObject : RaycastController
             float size = .3f;
             for (int i = 0; i < waypoints.Length; i++)
             {
-                Vector3 wpPos = Application.isPlaying ? globalWP[i] : waypoints[i] + transform.position;
+                Vector3 wpPos = Application.isPlaying ? globalWP[i] : waypoints[i] + (Vector2)transform.position;
                 Gizmos.DrawLine(wpPos - Vector3.up * size, wpPos + Vector3.up * size);
                 Gizmos.DrawLine(wpPos - Vector3.left * size, wpPos + Vector3.left * size);
             }

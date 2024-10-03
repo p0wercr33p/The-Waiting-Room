@@ -6,7 +6,8 @@ using static Unity.Burst.Intrinsics.X86.Avx;
 
 public class Throwable : RaycastController
 {
-    Player player; 
+    Player player;
+    PlayerHealth pHP;
     public Vector2 throwForce, grabHitBox, offset;
     public bool isFloating, beingCarried, inRange;
     public Vector2 velocity;
@@ -36,6 +37,7 @@ public class Throwable : RaycastController
         base.Start();
         col = GetComponent<BoxCollider2D>();
         player = Player.Ins;
+        pHP = PlayerHealth.Ins;
         plInput = PlayerInput.Ins;
         manager = Manager.Ins;
         contr = Controller.Ins;
@@ -79,7 +81,7 @@ public class Throwable : RaycastController
         }
         else if (type == ItemType.HEALING)
         {
-            player.hp += healAmount;
+            pHP.hp += healAmount;
             usages--;
         }
 

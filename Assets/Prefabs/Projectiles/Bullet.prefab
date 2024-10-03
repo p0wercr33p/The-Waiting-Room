@@ -193,12 +193,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a41af956e577d6a4daaad07a98917a3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 15
+  speed: 4
   life: 5
   distance: 0
   dmg: 1
   dmgVsEnemies: 0
   effect: 0
+  maxBounces: 3
   rb: {fileID: 815692343250016647}
   team: 1
   aiPath: {fileID: 0}

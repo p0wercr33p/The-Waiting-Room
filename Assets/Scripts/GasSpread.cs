@@ -9,7 +9,7 @@ public class GasSpread : MonoBehaviour
     public float growthTimer;
     [HideInInspector] public int effect;
     float nextGrowthTime;
-    Player player;
+    PlayerHealth player;
     bool canPoison;
     public float poisonTime;
     bool start;
@@ -20,7 +20,7 @@ public class GasSpread : MonoBehaviour
         col = GetComponent<CircleCollider2D>();
         nextGrowthTime = growthTimer;
         canPoison = true; start = false;
-        player = Player.Ins;
+        player = PlayerHealth.Ins;
     }
     IEnumerator StartGasCloud()
     {

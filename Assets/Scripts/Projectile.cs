@@ -2,16 +2,17 @@ using Pathfinding;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using static Unity.Burst.Intrinsics.X86.Avx;
 
 public class Projectile : MonoBehaviour
 {
     public float speed, life, distance;
-    public int dmg, dmgVsEnemies, effect;
+    public int dmg, dmgVsEnemies, effect, maxBounces;
     float lifeLeft;
     public Rigidbody2D rb; 
-    Player player; Transform plT;
+    Player player; Transform plT; PlayerHealth pHealth;
     string playerTag, enemyTag, obstacleTag, groundTag;
     public enum Team { PLAYER, ENEMY, NEITHER };
     public Team team; 
@@ -27,7 +28,8 @@ public class Projectile : MonoBehaviour
     Dictionary<Transform, HealthData> enemyBook;
     Dictionary<Transform, Throwable> itemBook;
     public string projTypeName;
-
+    int bounceCount;
+    public LayerMask mask;
 
     private void Awake()
     {
@@ -36,13 +38,13 @@ public class Projectile : MonoBehaviour
     }
     void Start()
     { 
-        player = Player.Ins;
+        player = Player.Ins; pHealth = PlayerHealth.Ins;
         plT = player.transform;
         enemyTag = "Enemy"; 
         playerTag = "Player";
         obstacleTag = "Obstacle";
         groundTag = "Ground";
-        
+        bounceCount = 0;
         active = true;
         if (heetSeeking) Invoke("SetTeamToNeither", 0.3f);
         if (ani == null) ani = GetComponent<Animator>();
@@ -96,7 +98,7 @@ public class Projectile : MonoBehaviour
             aiPath.enabled = true;
             Invoke("SetTeamToNeither", 0.3f);
         }
-        lifeLeft = life; hitbox.enabled = true; active = true;
+        lifeLeft = life; hitbox.enabled = true; active = true; bounceCount = 0;
     }
 
     public void SwitcHitboxActiveState()
@@ -110,25 +112,65 @@ public class Projectile : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D coll)
     {
-        bool pl = coll.CompareTag(playerTag);
-        bool enemy = coll.CompareTag(enemyTag);
         bool obs = coll.CompareTag(obstacleTag);
         bool gr = coll.CompareTag(groundTag);
+        if (obs || gr)
+        {
+            if (maxBounces <= 0) Explode();
+            else
+            {
+                float yDir = Mathf.Sign(rb.velocity.y);
+                float xDir = Mathf.Sign(rb.velocity.x);
+                float mag = rb.velocity.magnitude * Time.deltaTime;
+                Vector2 pos = transform.position;
+                RaycastHit2D roof = Physics2D.Raycast(pos, Vector2.up * yDir, 4, mask);
+                RaycastHit2D wall = Physics2D.Raycast(pos, Vector2.right * xDir, 4, mask);
+                float rDist = roof.collider != null ? roof.distance : -1;
+                float wDist = wall.collider != null ? wall.distance : -1;
+                print($"roof{rDist} >< wall{wDist}");
+                Debug.DrawRay(transform.position, Vector2.up * yDir, Color.yellow, 2f);
+                Debug.DrawRay(transform.position, Vector2.right * xDir, Color.yellow, 2f);
+                if (roof.collider != null && (wall.collider == null || roof.distance < wall.distance)){
+                    print("roof hit");
+                    Bounce(roof.normal);
+                }else if (wall.collider != null) { 
+                    print("wall hit");
+                    Bounce(wall.normal);
+                } else { print("miss"); Bounce(rb.velocity.normalized); }
+            }
+        }
 
-        print($"Hit da {coll.tag} -- {coll.name} --- {pl}-{enemy}-{obs}-{gr}");
+        bool pl = coll.CompareTag(playerTag);
+        bool enemy = coll.CompareTag(enemyTag);
 
-        if ((team == Team.ENEMY || team == Team.NEITHER) && pl) {
-            if (!trigger) player.TakeDamage(dmg, effect); 
+        if (pl && (team == Team.ENEMY || team == Team.NEITHER))
+        {
+            if (!trigger) pHealth.TakeDamage(dmg, effect);
             Explode();
-            
-        } else if ((team == Team.PLAYER || team == Team.NEITHER) && enemy) {
+
+        }
+        else if (enemy && (team == Team.PLAYER || team == Team.NEITHER))
+        {
             if (!enemyBook.ContainsKey(coll.transform))
                 enemyBook[coll.transform] = coll.GetComponent<HealthData>();
-            enemyBook[coll.transform].TakeDamage(dmgVsEnemies); 
+            enemyBook[coll.transform].TakeDamage(dmgVsEnemies);
             Explode();
-            
         }
-        if (obs || gr) Explode();
+    }
+    private void Bounce(Vector2 normal)
+    {
+        bounceCount++;
+        if (bounceCount > maxBounces)
+        {
+            Explode();
+            return;
+        }
+        print($"velocity {rb.velocity}   direction {rb.velocity.normalized}");
+        Vector2 dir = Vector2.Reflect(rb.velocity.normalized, normal);
+        print($"hit.normal: {normal.y}Y and {normal.x}X");
+
+        rb.velocity = dir * speed;
+        print($"New velocity {rb.velocity}   New direction {dir}");
     }
 
     private void OnDrawGizmos()

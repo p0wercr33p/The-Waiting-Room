@@ -237,8 +237,10 @@ MonoBehaviour:
   cyclic: 1
   walker: 1
   wpcolor: {r: 0, g: 1, b: 0.4763193, a: 1}
-  sprite: {fileID: 0}
   global: 1
+  bounce: 0
+  minBounces: 0
+  maxBounces: 0
 --- !u!114 &4906041857136640952
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -286,14 +288,12 @@ MonoBehaviour:
   effect: 0
   cap: 5
   timeLeft: 0
-  attackTime: 3
+  cooldown: 5
   drawPoint: {fileID: 0}
   firePoint: {fileID: 8504617590211075257}
-  inRange: 0
-  draw: 0
-  canAttack: 0
-  attacking: 0
   hasAggroBox: 0
+  draw: 0
+  inRange: 0
   aggroBoxColor: {r: 0.8113208, g: 0.117871106, b: 0.117871106, a: 0.73333335}
 --- !u!95 &7552698207971787680
 Animator:

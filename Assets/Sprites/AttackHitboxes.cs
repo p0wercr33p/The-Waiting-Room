@@ -19,6 +19,7 @@ public class AttackHitboxes : MonoBehaviour
     [SerializeField] public AggroBox aggro;
     [SerializeField] public int dmg, effect, cap;
     Player player;
+    PlayerHealth pHP;
     public float timeLeft, cooldown;
     [SerializeField] private Transform drawPoint,firePoint;
     bool canAttack, attacking;
@@ -31,6 +32,7 @@ public class AttackHitboxes : MonoBehaviour
     void Start()
     {
         player = Player.Ins;
+        pHP = PlayerHealth.Ins;
         plCol = player.GetComponent<BoxCollider2D>();
         if (hasAggroBox)
         {
@@ -123,7 +125,7 @@ public class AttackHitboxes : MonoBehaviour
         print(col.name);
         if (col.CompareTag("Player")) {
             print("hit player");
-            player.TakeDamage(dmg, effect);
+            pHP.TakeDamage(dmg, effect);
         }
     }
 
