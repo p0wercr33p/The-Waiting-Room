@@ -41,7 +41,6 @@ public class Multishot : MonoBehaviour
             GameObject orb = Instantiate(iceOrbPrefab, kts);
             Projectile comp = orb.GetComponent<Projectile>();
             iceOrbs[i] = (orb, comp);
-            orb.SetActive(false);
             Jim.AddObject(orb, "ORB", "Projectile");
         }
     }

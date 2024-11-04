@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 441804270777116491}
   - component: {fileID: 734536811183134535}
   - component: {fileID: 250662786391975586}
+  - component: {fileID: -6142783401907498189}
   m_Layer: 0
   m_Name: Detonate Bullet
   m_TagString: Untagged
@@ -199,6 +200,7 @@ MonoBehaviour:
   dmg: 0
   dmgVsEnemies: 0
   effect: 0
+  maxBounces: 0
   rb: {fileID: 0}
   team: 1
   aiPath: {fileID: 0}
@@ -206,3 +208,18 @@ MonoBehaviour:
   heetSeeking: 0
   trigger: 1
   projTypeName: DET
+  mask:
+    serializedVersion: 2
+    m_Bits: 0
+--- !u!114 &-6142783401907498189
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4457417560786684490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02cc899ed2c54474dac4d523f4edebfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

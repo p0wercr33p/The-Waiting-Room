@@ -36,28 +36,34 @@ public class Obstacle : MonoBehaviour
     }
     void Start()
     {
+        InstantiateObstacle();
+    }
+    void InstantiateObstacle()
+    {
         player = PlayerHealth.Ins;
         manager = Manager.Ins;
-        if (type == ObstacleType.FURY){
+        lifeLeft = lifeTimer;
+        if (type == ObstacleType.FURY)
+        {
             dmg = 4;
-            int ran = UnityEngine.Random.Range(0,10);
-            if (ran > 4){
+            int ran = UnityEngine.Random.Range(0, 10);
+            if (ran > 4)
+            {
                 transform.rotation = Quaternion.Euler(0, 0, 90f);
-                transform.position = new Vector2(85, transform.position.y);
-            } else{
+                transform.position = new Vector2(105, transform.position.y);
+            }
+            else
+            {
                 transform.position = new Vector2(transform.position.x, -20);
             }
         }
-        if (type == ObstacleType.BOMB) { 
-            explosion = Instantiate(triggerObjs[0]); 
-            explosion.SetActive(false); 
+        if (type == ObstacleType.BOMB)
+        {
+            explosion = Instantiate(triggerObjs[0]);
             throwable = GetComponent<Throwable>();
             ObjectManager.Ins.AddObject(explosion, "Explosion", "Hazard");
-        }
-        lifeLeft = lifeTimer;
-  
+        } 
     }
-
     void Update()
     {
         if (startTimer)

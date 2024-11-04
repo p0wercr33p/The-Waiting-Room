@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 5865350602988115903}
   - component: {fileID: 5996246333394853754}
   - component: {fileID: 5679596036914072420}
+  - component: {fileID: -163875456287410550}
   m_Layer: 0
   m_Name: IceSaws
   m_TagString: Damaging
@@ -204,8 +205,10 @@ MonoBehaviour:
   cyclic: 1
   walker: 0
   wpcolor: {r: 0, g: 0, b: 0, a: 1}
-  sprite: {fileID: 0}
   global: 1
+  bounce: 0
+  minBounces: 0
+  maxBounces: 0
 --- !u!61 &5679596036914072420
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -251,3 +254,15 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.55, y: 0.55}
   m_EdgeRadius: 0
+--- !u!114 &-163875456287410550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4788434151004218045}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02cc899ed2c54474dac4d523f4edebfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

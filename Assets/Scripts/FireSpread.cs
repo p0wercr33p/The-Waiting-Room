@@ -22,10 +22,10 @@ public class FireSpread : MonoBehaviour
         spreadCount = 1;
         var Jim = ObjectManager.Ins;
         fires = new GameObject[7];
+        Transform objHolder = GameObject.FindGameObjectWithTag("HazardHolder").transform;
         for (int i = 0; i < 7; i++)
         {
-            fires[i] = Instantiate(firePrefab);
-            fires[i].SetActive(false);
+            fires[i] = Instantiate(firePrefab, objHolder);
             Jim.AddObject(fires[i], "Fire", "Hazard");
         }
     }
@@ -90,7 +90,7 @@ public class FireSpread : MonoBehaviour
     }
     void StartFire()
     {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 4f, mask);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 2f, mask);
         if (hit)
         {
             contLeft = contRight = burning = true;

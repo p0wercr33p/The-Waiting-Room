@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3499633380506550765}
   - component: {fileID: 4844033392989690729}
   - component: {fileID: 3470000319814187875}
+  - component: {fileID: 195649682287618440}
   m_Layer: 0
   m_Name: CannonBall
   m_TagString: Projectile
@@ -178,6 +179,7 @@ MonoBehaviour:
   dmg: 2
   dmgVsEnemies: 0
   effect: 0
+  maxBounces: 0
   rb: {fileID: 3499633380506550765}
   team: 1
   aiPath: {fileID: 0}
@@ -185,6 +187,9 @@ MonoBehaviour:
   heetSeeking: 0
   trigger: 0
   projTypeName: CBALL
+  mask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!95 &3470000319814187875
 Animator:
   serializedVersion: 5
@@ -206,3 +211,15 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &195649682287618440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3657505283555492294}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02cc899ed2c54474dac4d523f4edebfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

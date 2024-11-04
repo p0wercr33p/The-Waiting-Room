@@ -39,6 +39,10 @@ public class Enemy : MonoBehaviour
     void Start() {
         player = Player.Ins;
         pHP = PlayerHealth.Ins;
+        InitializeEnemy();
+    }
+    public void InitializeEnemy()
+    {
         InitializeProjectiles();
         if (firePoint == null) firePoint = this.transform;
         if (!hasFollowAI) inShootRange = true;
@@ -72,14 +76,12 @@ public class Enemy : MonoBehaviour
         ObjectManager man = ObjectManager.Ins;
         if (type != EnemyType.MELEE && type != EnemyType.DUMMY && bullet == BulletType.PROJECTILE)
         {
-            print("initializing");
             projectiles = new (GameObject, Projectile)[cap];
             for (int i = 0; i < cap; i++)
             {
                 GameObject newProj = Instantiate(projectile, kts);
                 Projectile newProjInfo = newProj.GetComponent<Projectile>();
                 projectiles[i] = (newProj, newProjInfo);
-                newProj.SetActive(false);
                 man.AddObject(newProj, newProjInfo.projTypeName, "Projectile");
             }
         }

@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 6538902595876029712}
   - component: {fileID: 3197482546654212141}
   - component: {fileID: 4826645096707052099}
+  - component: {fileID: -5778637360668614289}
   m_Layer: 0
   m_Name: SuperBlast
   m_TagString: Projectile
@@ -178,6 +179,7 @@ MonoBehaviour:
   dmg: 1
   dmgVsEnemies: 1
   effect: 0
+  maxBounces: 0
   rb: {fileID: 6538902595876029712}
   team: 0
   aiPath: {fileID: 0}
@@ -185,6 +187,9 @@ MonoBehaviour:
   heetSeeking: 0
   trigger: 0
   projTypeName: SB
+  mask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!95 &4826645096707052099
 Animator:
   serializedVersion: 5
@@ -206,3 +211,15 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-5778637360668614289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4732262100006940771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02cc899ed2c54474dac4d523f4edebfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

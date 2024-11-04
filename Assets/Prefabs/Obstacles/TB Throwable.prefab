@@ -260,6 +260,7 @@ GameObject:
   - component: {fileID: 7064711475920499320}
   - component: {fileID: 7377462073599615603}
   - component: {fileID: 1567503791967410838}
+  - component: {fileID: 7141081166743485911}
   m_Layer: 0
   m_Name: TB Throwable
   m_TagString: Item
@@ -434,6 +435,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &7141081166743485911
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5029076835934088213}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02cc899ed2c54474dac4d523f4edebfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5460407577140409677
 GameObject:
   m_ObjectHideFlags: 0

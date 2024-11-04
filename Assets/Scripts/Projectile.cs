@@ -37,10 +37,15 @@ public class Projectile : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
     void Start()
-    { 
+    {
+        InstantiateProjectile();
+    }
+
+    void InstantiateProjectile()
+    {
         player = Player.Ins; pHealth = PlayerHealth.Ins;
         plT = player.transform;
-        enemyTag = "Enemy"; 
+        enemyTag = "Enemy";
         playerTag = "Player";
         obstacleTag = "Obstacle";
         groundTag = "Ground";
@@ -49,14 +54,12 @@ public class Projectile : MonoBehaviour
         if (heetSeeking) Invoke("SetTeamToNeither", 0.3f);
         if (ani == null) ani = GetComponent<Animator>();
         enemyBook = new Dictionary<Transform, HealthData>();
-        if (explosionPrefab != null){
+        if (explosionPrefab != null)
+        {
             explosion = Instantiate(explosionPrefab, GameObject.FindGameObjectWithTag("ProjectileHolder").transform);
-            explosion.SetActive(false);
         }
         lifeLeft = life;
     }
-
-
     void SetTeamToNeither() => team = Team.NEITHER;
     private void Update()
     {
@@ -117,27 +120,7 @@ public class Projectile : MonoBehaviour
         if (obs || gr)
         {
             if (maxBounces <= 0) Explode();
-            else
-            {
-                float yDir = Mathf.Sign(rb.velocity.y);
-                float xDir = Mathf.Sign(rb.velocity.x);
-                float mag = rb.velocity.magnitude * Time.deltaTime;
-                Vector2 pos = transform.position;
-                RaycastHit2D roof = Physics2D.Raycast(pos, Vector2.up * yDir, 4, mask);
-                RaycastHit2D wall = Physics2D.Raycast(pos, Vector2.right * xDir, 4, mask);
-                float rDist = roof.collider != null ? roof.distance : -1;
-                float wDist = wall.collider != null ? wall.distance : -1;
-                print($"roof{rDist} >< wall{wDist}");
-                Debug.DrawRay(transform.position, Vector2.up * yDir, Color.yellow, 2f);
-                Debug.DrawRay(transform.position, Vector2.right * xDir, Color.yellow, 2f);
-                if (roof.collider != null && (wall.collider == null || roof.distance < wall.distance)){
-                    print("roof hit");
-                    Bounce(roof.normal);
-                }else if (wall.collider != null) { 
-                    print("wall hit");
-                    Bounce(wall.normal);
-                } else { print("miss"); Bounce(rb.velocity.normalized); }
-            }
+            else BounceLogic();
         }
 
         bool pl = coll.CompareTag(playerTag);
@@ -147,7 +130,6 @@ public class Projectile : MonoBehaviour
         {
             if (!trigger) pHealth.TakeDamage(dmg, effect);
             Explode();
-
         }
         else if (enemy && (team == Team.PLAYER || team == Team.NEITHER))
         {
@@ -156,6 +138,31 @@ public class Projectile : MonoBehaviour
             enemyBook[coll.transform].TakeDamage(dmgVsEnemies);
             Explode();
         }
+    }
+    void BounceLogic()
+    {
+        float yDir = Mathf.Sign(rb.velocity.y);
+        float xDir = Mathf.Sign(rb.velocity.x);
+        float mag = rb.velocity.magnitude * Time.deltaTime;
+        Vector2 pos = transform.position;
+        RaycastHit2D roof = Physics2D.Raycast(pos, Vector2.up * yDir, 4, mask);
+        RaycastHit2D wall = Physics2D.Raycast(pos, Vector2.right * xDir, 4, mask);
+        float rDist = roof.collider != null ? roof.distance : -1;
+        float wDist = wall.collider != null ? wall.distance : -1;
+        print($"roof{rDist} >< wall{wDist}");
+        Debug.DrawRay(transform.position, Vector2.up * yDir, Color.yellow, 2f);
+        Debug.DrawRay(transform.position, Vector2.right * xDir, Color.yellow, 2f);
+        if (roof.collider != null && (wall.collider == null || roof.distance < wall.distance))
+        {
+            print("roof hit");
+            Bounce(roof.normal);
+        }
+        else if (wall.collider != null)
+        {
+            print("wall hit");
+            Bounce(wall.normal);
+        }
+        else { print("miss"); Bounce(rb.velocity.normalized); }
     }
     private void Bounce(Vector2 normal)
     {

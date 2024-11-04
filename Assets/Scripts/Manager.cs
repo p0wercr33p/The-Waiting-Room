@@ -31,10 +31,10 @@ public class Manager : MonoBehaviour
     void Start()
     {
         Jim = GetComponent<ObjectManager>();
-        StartLevel();
+        StartCoroutine(StartLevel());
         player = Player.Ins;
     }
-    void StartLevel()
+    IEnumerator StartLevel()
     {
         enemyDict = new();
         obsDict = new();
@@ -52,15 +52,16 @@ public class Manager : MonoBehaviour
         headsUps = new GameObject[levelItems];
         cannons = new GameObject[levelCannons];
         int c = cannonPicker.Length;
+        Transform objHolder = GameObject.FindGameObjectWithTag("HazardHolder").transform;
 
         for (int i = 0; i < levelHazards; i++)
         {
-            GameObject w = Instantiate(warning, this.transform);
+            GameObject w = Instantiate(warning, objHolder);
             w.transform.position = hazardPoints[i];
             warnings[i] = w;
             w.SetActive(false);
             (GameObject make, string type) = bank.MakeHazard();
-            GameObject h = Instantiate(make, this.transform);
+            GameObject h = Instantiate(make, objHolder);
             h.transform.position = hazardPoints[i];
             hazards[i] = h;
             Obstacle obs = h.GetComponent<Obstacle>();
@@ -70,27 +71,28 @@ public class Manager : MonoBehaviour
                 obsDict[h].index = i;
             }  
             Jim.AddObject(h, type, "Hazard");
-            h.SetActive(false);
         }
+        yield return null; yield return null;
         for (int i = 0; i < levelItems; i++)
         {
-            GameObject h = Instantiate(headsUp, transform);
+            GameObject h = Instantiate(headsUp, objHolder);
             h.transform.position = itemPoints[i];
             headsUps[i] = h;
             h.SetActive(false); int ran = Random.Range(0, bank.lvlItems.Length);
-            GameObject it = Instantiate(bank.lvlItems[ran], transform);
+            GameObject it = Instantiate(bank.lvlItems[ran], objHolder);
             h.name = $"HeadsUp! {it.name} {i}";
             it.transform.position = itemPoints[i];
-            items[i] = it; it.SetActive(false);
+            items[i] = it;
+            Jim.AddObject(it, bank.itemTypes[ran], "Item"); 
         }
-        
+        yield return null; yield return null;
         for (int i = 0; i < levelCannons; i++)
         {
-            GameObject cSign = Instantiate(cannonSign, transform);
+            GameObject cSign = Instantiate(cannonSign, objHolder);
             cSign.transform.position = cannonData[i].pos;
             cannonSigns[i] = cSign; cSign.SetActive(false);
             int ran = Random.Range(0, c);
-            GameObject cannon = Instantiate(cannonPicker[ran], transform);
+            GameObject cannon = Instantiate(cannonPicker[ran], objHolder);
             cannons[i] = cannon;
             enemyDict[cannon] = cannon.GetComponent<Enemy>();
             cannon.transform.position = cannonData[i].pos;
@@ -113,21 +115,19 @@ public class Manager : MonoBehaviour
                     enemyDict[cannon].shootDir = Vector2.right;
                     break;
             }
-            cannon.SetActive(false);
             Jim.AddObject(cannon, enemyDict[cannon].typeName, "Cannon");
         }
-
+        yield return null; yield return null;
         for (int i = 0; i < levelEnemies; i++)
         {
-            GameObject eSign = Instantiate(enemySign, transform);
+            GameObject eSign = Instantiate(enemySign, objHolder);
             eSign.transform.position = enemyPoints[i];
             enemySigns[i] = eSign; eSign.SetActive(false);
 
             int ran = Random.Range(0, bank.lvlEnemies.Length);
-            GameObject e = Instantiate(bank.lvlEnemies[ran], transform);
+            GameObject e = Instantiate(bank.lvlEnemies[ran], objHolder);
             e.transform.position = enemyPoints[i];
             enemies[i] = e;
-            e.SetActive(false);
             Jim.AddObject(e, bank.enemyNames[ran], "Droid");
         }
     }

@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 7079603022557409165}
   - component: {fileID: 221679241244202053}
   - component: {fileID: 8840575316573633519}
+  - component: {fileID: -519961375176022587}
   m_Layer: 0
   m_Name: LaserCannon
   m_TagString: Enemy
@@ -107,7 +108,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 200
   projectile: {fileID: 3657505283555492294, guid: bf510d3ab62e0b64aa9396295fa08f4e, type: 3}
-  dummyRainbow: []
   spR: {fileID: 0}
   laserLine: {fileID: 7079603022557409165}
   cap: 3
@@ -314,3 +314,15 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-519961375176022587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4289633382591817631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02cc899ed2c54474dac4d523f4edebfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

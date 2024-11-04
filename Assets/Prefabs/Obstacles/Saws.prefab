@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 3030870962948280541}
   - component: {fileID: 4374887617951617832}
   - component: {fileID: -6232980810143443845}
+  - component: {fileID: 1985410771015722698}
   m_Layer: 0
   m_Name: Saws
   m_TagString: Damaging
@@ -249,5 +250,19 @@ MonoBehaviour:
   cyclic: 1
   walker: 0
   wpcolor: {r: 0, g: 0, b: 0, a: 1}
-  sprite: {fileID: 0}
   global: 1
+  bounce: 0
+  minBounces: 0
+  maxBounces: 0
+--- !u!114 &1985410771015722698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8990184484312988192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02cc899ed2c54474dac4d523f4edebfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

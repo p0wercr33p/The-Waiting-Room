@@ -50,6 +50,7 @@ GameObject:
   - component: {fileID: 649058775022005865}
   - component: {fileID: -2386162885183271103}
   - component: {fileID: 4014780308924653254}
+  - component: {fileID: 755648512144215615}
   m_Layer: 0
   m_Name: Droid
   m_TagString: Enemy
@@ -187,8 +188,7 @@ MonoBehaviour:
   laserMask:
     serializedVersion: 2
     m_Bits: 0
-  projectile: {fileID: 5997529678483735824, guid: 8f5f83e6735d26b4b9b457937d44abad, type: 3}
-  dummyRainbow: []
+  projectile: {fileID: 8791549566423477395, guid: 8f5f83e6735d26b4b9b457937d44abad, type: 3}
   spR: {fileID: 0}
   laserLine: {fileID: 0}
   cap: 3
@@ -374,3 +374,15 @@ MonoBehaviour:
   slowWhenNotFacingTarget: 1
   whenCloseToDestination: 0
   constrainInsideGraph: 1
+--- !u!114 &755648512144215615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8630758453928889364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02cc899ed2c54474dac4d523f4edebfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

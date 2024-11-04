@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: -1232579307682505154}
   - component: {fileID: 3678940245862166053}
   - component: {fileID: 7910244018477069052}
+  - component: {fileID: 1093257743529227322}
   m_Layer: 0
   m_Name: iceOrb
   m_TagString: Damaging
@@ -210,3 +211,15 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1093257743529227322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5968795696289974571}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02cc899ed2c54474dac4d523f4edebfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5244065369055437205}
   - component: {fileID: 4067085209331296508}
   - component: {fileID: 2063071364188169434}
+  - component: {fileID: -5910170225224594237}
   m_Layer: 0
   m_Name: PowerBlaster
   m_TagString: Item
@@ -182,6 +183,7 @@ MonoBehaviour:
     m_Bits: 72
   throwForce: {x: 0.5, y: 0.5}
   grabHitBox: {x: 2.5, y: 2.5}
+  offset: {x: 0, y: 0}
   isFloating: 0
   beingCarried: 0
   inRange: 0
@@ -189,6 +191,7 @@ MonoBehaviour:
   gravity: -3.5
   grabBox:
     center: {x: 0, y: 0}
+    offset: {x: 0, y: 0}
     right: 0
     left: 0
     top: 0
@@ -204,3 +207,15 @@ MonoBehaviour:
   usages: 10
   projName: PowerBlast
   type: 1
+--- !u!114 &-5910170225224594237
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1146477674919748704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02cc899ed2c54474dac4d523f4edebfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

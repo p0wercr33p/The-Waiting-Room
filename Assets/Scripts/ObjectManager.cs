@@ -1,7 +1,9 @@
 using Pathfinding;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
+using UnityEditor.ShaderKeywordFilter;
 using UnityEngine;
 using UnityEngine.Rendering;
 using static Obstacle;
@@ -11,9 +13,11 @@ public class ObjectManager : MonoBehaviour
     public static ObjectManager Ins;
     PlayerHealth pHP;
     Player pl;
+    PlayerInput plI;
     public string curMod;
     public bool Plus;
-    public string[] mods; 
+    public string[] mods;
+    public HashSet<string> curMods;
     public int ind;
     public DROIDS Droids;
     public _Bombs Bombs;
@@ -25,6 +29,7 @@ public class ObjectManager : MonoBehaviour
     public HeavensFuries Furies;
     public _Toxic Toxic;
     public _FreezeBlast Freeze;
+    public _Items Items;
     private void Awake() {
         Ins = this;
         Droids = new DROIDS(1);
@@ -37,6 +42,7 @@ public class ObjectManager : MonoBehaviour
         Toxic = new _Toxic(1);
         Fire = new _Flames(1);
         Freeze = new _FreezeBlast(1);
+        Items = new _Items(1);
         ind = 0;
         mods = new string[] {
             "Bigger Bombs", "Tankier Tanks", "Amber Alert", "Hasty Rockets", "Bigger Gun Diplomacy",
@@ -46,15 +52,23 @@ public class ObjectManager : MonoBehaviour
             "Half Able-Bodied", "Fool's Gambit", "Better Bombs", "Scorched Earth"
         };
         curMod = mods[ind];
+        curMods = new HashSet<string>();
     }
-
+    private void Start()
+    {
+        pHP = PlayerHealth.Ins;
+        pl = Player.Ins;
+        plI = PlayerInput.Ins;
+        Empty();
+    }
+    void Empty() => curMods = new HashSet<string>();
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             ind = (ind) % mods.Length;
             curMod = mods[ind];
-            AddMod(curMod);
+            AddMod(curMod, Plus);
         }
         if (Input.GetKeyDown(KeyCode.Alpha5))
         {
@@ -148,32 +162,78 @@ public class ObjectManager : MonoBehaviour
                     case "ORB": Projs.orb.arr.Add((add, pr)); Projs.orb.count.Add(add); break;
                 }
                 break;
+            case "Item":
+                Throwable thr = add.GetComponent<Throwable>();
+                switch (type)
+                {
+                    case "SB": Items.sb.arr.Add((add,thr)); Items.sb.count.Add(add); break;
+                    case "PB": Items.pb.arr.Add((add, thr)); Items.pb.count.Add(add); break;
+                    case "MED": Items.med.arr.Add((add, thr)); Items.med.count.Add(add); break;
+                }
+                break;
         }
     }
-    public void AddMod(string ModToAdd)
+    public void AddMod(string ModToAdd, bool plus)
     {
+        if (curMods.Contains(ModToAdd)) return;
+
+        if (!mods.Contains(ModToAdd)) print($"Mod is invalid: {ModToAdd}. Defaulting to \"More Damage\"");
+        else { curMods.Add(ModToAdd); print($"Adding Mod: {ModToAdd}"); }
+
         switch (ModToAdd)
         {
-            case "Bigger Bombs": BiggerBombs(Plus); break;
-            case "Tankier Tanks": TankierTanks(Plus); break;
-            case "Amber Alert": AmberAlert(Plus); break;
-            case "Hasty Rockets": HastyRockets(Plus); break;
-            case "Schrodinger's Damager Numbers": SchrodingersDamagerNumbers(Plus); break;
-            case "Property Purgatory": PropertyPurgatory(Plus); break;
+            case "Bigger Bombs": BiggerBombs(plus); break;
+            case "Tankier Tanks": TankierTanks(plus); break;
+            case "Amber Alert": AmberAlert(plus); break;
+            case "Hasty Rockets": HastyRockets(plus); break;
+            case "Schrodinger's Damager Numbers": SchrodingersDamagerNumbers(plus); break;
+            case "Property Purgatory": PropertyPurgatory(plus); break;
             case "Newton's New Law": NewtonsNewLaw(); break;
-            case "Bigger Gun Diplomacy": BiggerGunDiplomacy(Plus); break;
-            case "Wrath Of The Gods": WrathOfTheGods(Plus); break;
-            case "Foot Soldier": FootSoldier(Plus); break;
-            case "Slower Than A Speeding Bullet": SlowerThanASpeedingBullet(Plus); break;
-            case "Give Me Liberty Give Me Fire": GiveMeLibertyGiveMeFire(Plus); break;
-            case "Make Love Not Waste": MakeLoveNotWaste(Plus); break;
+            case "Bigger Gun Diplomacy": BiggerGunDiplomacy(plus); break;
+            case "Wrath Of The Gods": WrathOfTheGods(plus); break;
+            case "Foot Soldier": FootSoldier(plus); break;
+            case "Slower Than A Speeding Bullet": SlowerThanASpeedingBullet(plus); break;
+            case "Give Me Liberty Give Me Fire": GiveMeLibertyGiveMeFire(plus); break;
+            case "Make Love Not Waste": MakeLoveNotWaste(plus); break;
             case "Multi Multishot": MultiMultiShot(); break;
-            case "More Damage": MoreDamage(Plus); break;
-            case "Half Able-Bodied": HalfAbleBodied(Plus); break;
-            case "Fool's Gambit": FoolsGambit(Plus); break;
-            case "Better Bombs": BetterBombs(Plus); break;
-            case "Scorched Earth": ScorchedEarth(Plus); break;
+            case "More Damage": MoreDamage(plus); break;
+            case "Half Able-Bodied": HalfAbleBodied(plus); break;
+            case "Fool's Gambit": FoolsGambit(plus); break;
+            case "Better Bombs": BetterBombs(plus); break;
+            case "Scorched Earth": ScorchedEarth(plus); break;
+            default: MoreDamage(plus); break;
         }
+    }
+    public void PL_Healthy()
+    {
+        // You get 10 extra maxHP
+        pHP.maxHp += 10;
+    }
+    public void PL_FlipHappy()
+    {
+        // Cooldown on Gravity switch is lowered by 25%
+        plI.gravityFlipTimer *= 0.75f;
+    }
+    public void PL_TooFast()
+    {
+        // Speed increased by 8
+        pl.speed += 8;
+    }
+    public void PL_BetterSpecs()
+    {
+        // Your Projectiles are 50% faster and have a chance to not consume usauges
+        Projs.sb.curSpeed = Projs.sb.speed * 1.5f;
+        Projs.pb.curSpeed = Projs.pb.speed * 1.5f;
+        Projs.pb.SetNewStats(); Projs.sb.SetNewStats();
+        plI.conservancy = true;
+    }
+    public void PL_Gluttony()
+    {
+        // Items grant 5 more hp and charges
+        Items.med.curHealAmount += 5;
+        Items.pb.curUsages += 5;
+        Items.sb.curUsages += 5;
+        Items.SetNewStatsAll();
     }
     public void ScorchedEarth(bool plus = false)
     {
@@ -202,13 +262,24 @@ public class ObjectManager : MonoBehaviour
         var ranMods = new List<string>();
         foreach (var mod in mods)
             ranMods.Add(mod);
-        ranMods.Remove("Fool's Gambit");
-        int ranMod = UnityEngine.Random.Range(0, ranMods.Count);
-        AddMod(ranMods[ranMod]);
+        
+        foreach (var mod in curMods)
+            ranMods.Remove(mod);
+
+        int count = ranMods.Count;
+        int ranMod = UnityEngine.Random.Range(0, count);
+        AddMod(ranMods[ranMod], false);
         ranMods.RemoveAt(ranMod);
 
-        ranMod = UnityEngine.Random.Range(0, ranMods.Count);
-        AddMod(ranMods[ranMod]);
+        ranMod = UnityEngine.Random.Range(0, count - 1);
+        AddMod(ranMods[ranMod], false);
+
+        if (plus)
+        {
+            ranMods.RemoveAt(ranMod);
+            ranMod = UnityEngine.Random.Range(0, count - 2);
+            AddMod(ranMods[ranMod], false);
+        }
     }
     public void BiggerGunDiplomacy(bool plus = false)
     {
@@ -353,6 +424,7 @@ public class ObjectManager : MonoBehaviour
         Saws.SetNewStatsAll();
         Freeze.SetNewStats();
     }
+
     public void PropertyPurgatory(bool plus = false)
     {
         //All projectiles get a (probably) new random properties,
@@ -395,8 +467,79 @@ public class ObjectManager : MonoBehaviour
         Droids.sh.curDmg = UnityEngine.Random.Range(minRange, max);
         Droids.SetNewStatsAll(new HashSet<string>() { "SH" });
     }
-    
 
+
+    [System.Serializable]
+    public struct _Items
+    {
+        public MedKit med;
+        public SBlaster sb;
+        public PBlaster pb;
+        
+        public _Items(int i)
+        {
+            med = new MedKit(1);
+            sb = new SBlaster(1);
+            pb = new PBlaster(1);
+        }
+        public void SetNewStatsAll()
+        {
+            med.SetNewStats();
+            sb.SetNewStats();
+            pb.SetNewStats();
+        }
+        public struct MedKit
+        {
+            public List<(GameObject obj, Throwable it)> arr;
+            public List<GameObject> count;
+            public int healAmount, curHealAmount;
+
+            public MedKit(int i)
+            {
+                arr = new(); count = new();
+                healAmount = curHealAmount = 5;
+            }
+            public void SetNewStats()
+            {
+                foreach (var medkit in arr)
+                    medkit.it.healAmount = curHealAmount;
+            }
+        }
+        public struct SBlaster
+        {
+            public List<(GameObject obj, Throwable it)> arr;
+            public List<GameObject> count;
+            public int usages, curUsages;
+
+            public SBlaster(int i)
+            {
+                arr = new(); count = new();
+                usages = curUsages = 10;
+            }
+            public void SetNewStats()
+            {
+                foreach (var sBlaster in arr)
+                    sBlaster.it.usages = curUsages;
+            }
+        }
+        public struct PBlaster
+        {
+            public List<(GameObject obj, Throwable it)> arr;
+            public List<GameObject> count;
+            public int usages, curUsages;
+
+            public PBlaster(int i)
+            {
+                arr = new(); count = new();
+                usages = curUsages = 10;
+            }
+            public void SetNewStats()
+            {
+                foreach (var pBlaster in arr)
+                    pBlaster.it.usages = curUsages;
+            }
+        }
+    }
     [System.Serializable]
     public struct _Toxic
     {

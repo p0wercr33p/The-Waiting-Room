@@ -35,6 +35,11 @@ public class Throwable : RaycastController
     public override void Start()
     {
         base.Start();
+        InstantiateItem();
+    }
+
+    void InstantiateItem()
+    {
         col = GetComponent<BoxCollider2D>();
         player = Player.Ins;
         pHP = PlayerHealth.Ins;
@@ -46,7 +51,6 @@ public class Throwable : RaycastController
         grabBox = new GrabBox(col.bounds, grabHitBox, player, Id, offset);
         if (type == ItemType.BOMB) bomb = GetComponent<Obstacle>();
     }
-
     // Update is called once per frame
     void Update()
     {
@@ -81,7 +85,8 @@ public class Throwable : RaycastController
         }
         else if (type == ItemType.HEALING)
         {
-            pHP.hp += healAmount;
+            int newHP = Mathf.Clamp(pHP.hp + healAmount, 0, pHP.maxHp);
+            pHP.hp = newHP;
             usages--;
         }
 

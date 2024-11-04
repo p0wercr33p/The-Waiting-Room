@@ -18,6 +18,7 @@ public class PauseEvent : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Alpha9))
             PauseGame();
+        
     }
     public void PauseGame()
     {

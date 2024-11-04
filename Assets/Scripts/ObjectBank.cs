@@ -39,6 +39,7 @@ public class ObjectBank : MonoBehaviour
     public GameObject[] lvlHazards;
     public GameObject[] lvlItems;
     public GameObject[] lvlEnemies;
+    [HideInInspector] public string[] itemTypes;
     string[] hazardTypes;
 
 
@@ -71,6 +72,7 @@ public class ObjectBank : MonoBehaviour
     {
         lvlEnemies = new GameObject[] { droid, rocketDroid, stormHead, groundDroid, fireDroid};
         lvlItems = new GameObject[] { sBlaster, heart, pBlaster};
+        itemTypes = new string[] { "SB", "MED", "PB" };
         lvlHazards = new GameObject[] { iceSaws, saws, fireSaws, bombs, heavensFury, freezeBlast, toxicBarrel };
         hazardTypes = new string[] { "IceSaws", "Saws", "FireSaws", "Bombs", "Fury", "FreezeBlast", "ToxicBarrel" };
         enemyNames = new string[] { "DR", "RD", "SH", "GD", "FD" };

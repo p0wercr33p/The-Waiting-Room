@@ -5,15 +5,18 @@ using UnityEngine;
 public class PlayerInput : MonoBehaviour
 {
     Player player;
+
     float dirX;
     public Transform keepToScale;
     [HideInInspector] public Vector2 input;
     [HideInInspector] public SpriteRenderer sprite;
+    public bool conservancy;
     Animator ani; 
-    [HideInInspector] bool running, grounded, attacking;
+    [HideInInspector] bool running, grounded, attacking, flipGrav;
     Vector3 baseScale;
     Vector3 curPlayerScale;
 
+    public float gravityFlipTimer;
     [Header("Projectile Dictionary Values")]
     [SerializeField] public ProjDict superBlast;
     [SerializeField] public ProjDict powerBlast;
@@ -36,6 +39,7 @@ public class PlayerInput : MonoBehaviour
         projs = new();
         usages = new();
         attacking = false;
+        flipGrav = true;
         dirX = 1;
         player = Player.Ins;
         sprite = GetComponent<SpriteRenderer>();
@@ -67,7 +71,6 @@ public class PlayerInput : MonoBehaviour
         {
             GameObject pr = Instantiate(powerBlast.projectile, keepToScale);
             Projectile info = pr.GetComponent<Projectile>();
-            pr.SetActive(false);
             powerBlast.pr[i] = pr;
             powerBlast.info[i] = info;
             Jim.AddObject(pr, "PB", "Projectile");
@@ -97,10 +100,19 @@ public class PlayerInput : MonoBehaviour
             ani.SetTrigger(cur);
         }
         if (Input.GetKeyDown(KeyCode.Alpha6)) usages[cur] += 3;
-        if (Input.GetKeyDown(KeyCode.P)) player.ChangeGravity(0);
+        if (Input.GetKeyDown(KeyCode.P) && flipGrav) { 
+            StartCoroutine(GravityFlipCoolDown());
+            player.ChangeGravity(0); 
+        }
         HandleAnimations();
         if (Input.GetKeyDown(KeyCode.Space)) { player.OnJumpInputDown(); }
         if (Input.GetKeyUp(KeyCode.Space)) { player.OnJumpInputUp(); }
+    }
+    IEnumerator GravityFlipCoolDown()
+    {
+        flipGrav = false;
+        yield return new WaitForSeconds(gravityFlipTimer);
+        flipGrav = true;
     }
     public void ShootLogic()
     {
@@ -117,13 +129,7 @@ public class PlayerInput : MonoBehaviour
         }
         return (null, null);
     }
-    public void ChangeStruct(ProjDict pd, string _name){
-        switch (name)
-        {
-            case "SuperBlast": superBlast = pd; projs[_name] = pd; break;
-            case "PowerBlast": powerBlast = pd; projs[_name] = pd; break;
-        }
-    }
+
     void Shoot(ProjDict pd, string _name)
     {
         if (usages[_name] <= 0) return;
@@ -133,7 +139,10 @@ public class PlayerInput : MonoBehaviour
 
         if (proj != null)
         {
-            usages[_name]--;
+            if (conservancy){
+                int ran = Random.Range(0, 10);
+                if (ran >= 4) usages[_name]--;
+            } else usages[_name]--;
             proj.SetActive(true);
 
             proj.transform.position = pd.firePoint.position;
@@ -167,7 +176,6 @@ public class PlayerInput : MonoBehaviour
         public Projectile[] info;
         public Transform firePoint;
         public bool mouseAim, isProj;
-        
     }
 
     private void OnDrawGizmos()

@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 8251487661983374599}
   - component: {fileID: 3511859106787908707}
   - component: {fileID: 3088028237205774507}
+  - component: {fileID: 535368779984466392}
   m_Layer: 0
   m_Name: Rocket
   m_TagString: Projectile
@@ -202,6 +203,7 @@ MonoBehaviour:
   dmg: 2
   dmgVsEnemies: 6
   effect: 2
+  maxBounces: 0
   rb: {fileID: 0}
   team: 1
   aiPath: {fileID: 3511859106787908707}
@@ -209,6 +211,9 @@ MonoBehaviour:
   heetSeeking: 1
   trigger: 0
   projTypeName: RK
+  mask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &8251487661983374599
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -294,3 +299,15 @@ MonoBehaviour:
   version: 1
   target: {fileID: 0}
   targetPlayer: 1
+--- !u!114 &535368779984466392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7088820785956754215}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02cc899ed2c54474dac4d523f4edebfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

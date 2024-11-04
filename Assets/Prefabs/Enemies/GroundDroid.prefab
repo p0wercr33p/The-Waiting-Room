@@ -47,6 +47,7 @@ GameObject:
   - component: {fileID: 4906041857136640952}
   - component: {fileID: 6980802799415575823}
   - component: {fileID: 7552698207971787680}
+  - component: {fileID: -2741920305458923654}
   m_Layer: 0
   m_Name: GroundDroid
   m_TagString: Enemy
@@ -316,6 +317,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-2741920305458923654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4540677055907843184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02cc899ed2c54474dac4d523f4edebfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8303647838061975395
 GameObject:
   m_ObjectHideFlags: 0

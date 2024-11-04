@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 2688695049095042965}
   - component: {fileID: 7969920549221130673}
   - component: {fileID: 3007634511102266047}
+  - component: {fileID: 8087755845664615327}
   m_Layer: 0
   m_Name: FireSaws
   m_TagString: Damaging
@@ -249,5 +250,19 @@ MonoBehaviour:
   cyclic: 1
   walker: 0
   wpcolor: {r: 0, g: 0, b: 0, a: 1}
-  sprite: {fileID: 0}
   global: 1
+  bounce: 0
+  minBounces: 0
+  maxBounces: 0
+--- !u!114 &8087755845664615327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6443687751207056358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02cc899ed2c54474dac4d523f4edebfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

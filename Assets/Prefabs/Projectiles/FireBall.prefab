@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 3102430811871926993}
   - component: {fileID: 5438108763101974074}
   - component: {fileID: 5302897373882116641}
+  - component: {fileID: 5721209321771840928}
   m_Layer: 0
   m_Name: FireBall
   m_TagString: Untagged
@@ -128,6 +129,7 @@ MonoBehaviour:
   dmg: 3
   dmgVsEnemies: 2
   effect: 2
+  maxBounces: 0
   rb: {fileID: 3102430811871926993}
   team: 1
   aiPath: {fileID: 0}
@@ -135,6 +137,9 @@ MonoBehaviour:
   heetSeeking: 0
   trigger: 0
   projTypeName: FB
+  mask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!50 &3102430811871926993
 Rigidbody2D:
   serializedVersion: 4
@@ -236,3 +241,15 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.14, y: 0.14}
   m_EdgeRadius: 0
+--- !u!114 &5721209321771840928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 119218099813073241}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02cc899ed2c54474dac4d523f4edebfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

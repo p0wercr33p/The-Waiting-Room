@@ -151,6 +151,7 @@ GameObject:
   - component: {fileID: 49923997544847294}
   - component: {fileID: 5178368677900312340}
   - component: {fileID: 5770857685202340262}
+  - component: {fileID: 6580882689664213903}
   m_Layer: 0
   m_Name: Moving Cannon
   m_TagString: Enemy
@@ -245,7 +246,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   projectile: {fileID: 3657505283555492294, guid: bf510d3ab62e0b64aa9396295fa08f4e, type: 3}
-  dummyRainbow: []
   spR: {fileID: 0}
   laserLine: {fileID: 0}
   cap: 3
@@ -371,5 +371,19 @@ MonoBehaviour:
   cyclic: 1
   walker: 0
   wpcolor: {r: 0.9339623, g: 0.32953006, b: 0.32953006, a: 1}
-  sprite: {fileID: 0}
   global: 1
+  bounce: 0
+  minBounces: 0
+  maxBounces: 0
+--- !u!114 &6580882689664213903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9194609171423784632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02cc899ed2c54474dac4d523f4edebfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
